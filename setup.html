@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QSP — Cài Đặt Node.js & Tool Dò</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a1a;color:#fff;font-family:'Inter',sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.box{background:linear-gradient(135deg,#0f1525,#1a1a3e);padding:40px;border-radius:24px;max-width:700px;width:100%;box-shadow:0 0 80px rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.15)}
+h1{background:linear-gradient(135deg,#00e676,#00bcd4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:32px;margin-bottom:8px;text-align:center}
+.sub{color:#888;font-size:14px;margin-bottom:30px;text-align:center}
+.steps{text-align:left}
+.step{background:rgba(0,0,0,.3);padding:20px;border-radius:12px;margin:12px 0;font-size:14px;border:1px solid rgba(255,255,255,.04);line-height:1.6;color:#bbb}
+.step b{color:#00e676;font-size:16px;display:block;margin-bottom:8px}
+.step img{max-width:100%;border-radius:8px;margin-top:10px;border:1px solid rgba(255,255,255,.1)}
+.code{background:#111;padding:10px 15px;border-radius:8px;font-family:monospace;color:#00e676;margin-top:10px;display:block;border:1px solid rgba(0,230,118,.2)}
+.btn-back{display:block;margin:30px auto 0;padding:12px 30px;background:rgba(255,255,255,.05);color:#fff;text-decoration:none;border-radius:10px;text-align:center;width:fit-content;transition:.3s;font-weight:600}
+.btn-back:hover{background:rgba(255,255,255,.1)}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>📖 Hướng Dẫn Setup Tool Dò</h1>
+<p class="sub">Chỉ dành cho máy tính (Laptop/PC) để cấp nguồn đáp án cho toàn server.</p>
+
+<div class="steps">
+  <div class="step">
+    <b>Bước 1: Tải và cài đặt Node.js</b>
+    Vào trang chủ <a href="https://nodejs.org/" target="_blank" style="color:#00bcd4">nodejs.org</a> tải bản LTS mới nhất và cài đặt (Cứ bấm Next liên tục là xong).
+  </div>
+  <div class="step">
+    <b>Bước 2: Tải file chạy Tool</b>
+    Admin sẽ gửi bạn 1 file tên là <code>proxy.js</code>. Hãy lưu file này vào máy tính của bạn (Ví dụ: Desktop).
+  </div>
+  <div class="step">
+    <b>Bước 3: Mở Terminal / CMD</b>
+    Mở thư mục chứa file proxy.js -> Nhấp chuột phải vào khoảng trống -> Chọn <b>Open in Terminal</b> (Hoặc gõ <code>cmd</code> lên thanh địa chỉ thư mục rồi Enter).
+  </div>
+  <div class="step">
+    <b>Bước 4: Chạy Server Tool Dò</b>
+    Trên cửa sổ Terminal đen ngòm, hãy nhập lệnh sau và bấm Enter:
+    <span class="code">node proxy.js</span>
+    Nếu thấy chữ "Server ready!" và "Port 9876" hiện ra là bạn đã cắm tool thành công. Đừng tắt cửa sổ đen này khi đang kiếm đáp án nhé!
+  </div>
+</div>
+
+<a href="shop.html" class="btn-back">⬅️ Về trang chủ</a>
+
+</div>
+</body>
+</html>

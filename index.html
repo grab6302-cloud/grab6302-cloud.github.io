@@ -35,7 +35,15 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 /* TOP BAR */
 .topbar{position:fixed;top:0;left:0;right:0;background:rgba(11,11,30,.97);border-bottom:1px solid var(--border);padding:12px 24px;display:none;justify-content:space-between;align-items:center;z-index:500;backdrop-filter:blur(10px)}
 .topbar .user{color:var(--green);font-size:14px;font-weight:600}
-.topbar .balance{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);padding:6px 16px;border-radius:20px;color:var(--green);font-size:14px;font-weight:700;margin:0 8px}
+.topbar .balance{background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.4);padding:6px 16px 12px;border-radius:20px;color:var(--cyan);font-size:14px;font-weight:700;margin:0 8px;cursor:pointer;transition:.3s;position:relative}
+.topbar .balance:hover{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,188,212,.25)}
+
+/* BALANCE DROPDOWN */
+.bal-dropdown{position:absolute;top:100%;right:-10px;background:#13132d;border:1px solid rgba(0,188,212,.3);border-radius:12px;min-width:185px;box-shadow:0 8px 30px rgba(0,0,0,.5);max-height:0;overflow:hidden;transition:max-height .35s ease,opacity .3s;opacity:0;z-index:600;margin-top:2px}
+.topbar .balance:hover .bal-dropdown{max-height:130px;opacity:1}
+.bal-dropdown a{display:flex;align-items:center;gap:10px;padding:14px 18px;color:#ddd;font-size:14px;font-weight:600;text-decoration:none;transition:.2s;border-bottom:1px solid rgba(255,255,255,.05)}
+.bal-dropdown a:last-child{border-bottom:none}
+.bal-dropdown a:hover{background:rgba(0,188,212,.08);color:var(--cyan)}
 .topbar button{padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#ddd;font-size:13px;cursor:pointer;transition:.3s}
 .topbar button:hover{border-color:var(--green);color:var(--green)}
 .tbn{display:flex;align-items:center;gap:6px}
@@ -85,8 +93,8 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .plan-list{list-style:none;text-align:left;font-size:14px;color:#ccc;flex:1}
 .plan-list li{padding:6px 0;padding-left:22px;position:relative}
 .plan-list li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700}
-.plan .buy-btn{display:block;margin-top:auto;padding:14px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font:bold 15px 'Inter',sans-serif;border:none;border-radius:12px;cursor:pointer;width:100%;margin-top:28px;transition:.3s;position:relative;overflow:hidden}
-.plan .buy-btn:hover{transform:scale(1.03);box-shadow:0 6px 20px rgba(0,230,118,.25)}
+.plan .buy-btn{display:block;margin-top:auto;padding:14px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font:bold 15px 'Inter',sans-serif;border:none;border-radius:12px;cursor:pointer;width:100%;transition:.3s;position:relative;overflow:hidden}
+.plan .buy-btn:hover{transform:scale(1.03) translateY(-2px);box-shadow:0 6px 20px rgba(0,230,118,.25)}
 .plan .buy-btn:active{transform:scale(.97)}
 
 /* MY KEYS */
@@ -140,10 +148,11 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .trust-label{font-size:14px;color:#999;margin-top:4px}
 
 .how{padding:70px 20px;text-align:center}
-.steps{display:flex;gap:14px;justify-content:center;flex-wrap:nowrap;max-width:850px;margin:30px auto 0}
-.step{background:var(--card);border:1px solid var(--border);padding:32px 24px;border-radius:18px;flex:1}
+.steps{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;max-width:1100px;margin:30px auto 0}
+.step{background:var(--card);border:1px solid var(--border);padding:32px 28px;border-radius:18px;flex:1;min-width:160px}
 .step-num{background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font-weight:800;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:18px}
-.step p{font-size:15px;color:#bbb;white-space:nowrap}
+.step p{font-size:14px;color:#bbb;line-height:1.5}
+.step a{text-decoration:none}
 .step b{color:#fff;display:block;margin-bottom:8px;font-size:17px}
 .footer{padding:50px 20px;text-align:center;border-top:1px solid var(--border)}
 .footer p{color:#777;font-size:14px;margin-bottom:8px}
@@ -176,6 +185,40 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .4s;padding:0 20px;font-size:14px;color:#bbb;line-height:1.7}
 .faq-item.open .faq-a{max-height:200px;padding:0 20px 18px}
 
+/* KEYS MODAL */
+.keys-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1500;justify-content:center;align-items:flex-start;padding:60px 20px;overflow-y:auto;backdrop-filter:blur(4px)}
+.keys-modal.show{display:flex}
+.keys-panel{background:#0f1525;border:2px solid transparent;border-radius:20px;max-width:700px;width:100%;padding:30px;position:relative;animation:fadeIn .3s;background-clip:padding-box;box-shadow:0 0 0 2px rgba(0,188,212,.3),0 0 40px rgba(0,188,212,.08),inset 0 1px 0 rgba(255,255,255,.05)}
+.keys-panel h2{color:var(--cyan);font-size:20px;margin-bottom:20px;text-align:center}
+.keys-close{position:absolute;top:14px;right:18px;background:none;border:none;color:#888;font-size:22px;cursor:pointer;transition:.3s;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.keys-close:hover{color:#ff4444;background:rgba(255,68,68,.12);transform:rotate(90deg);box-shadow:0 0 15px rgba(255,68,68,.2)}
+.keys-close:active{transform:rotate(180deg) scale(.9);color:#ff0000}
+.keys-table{width:100%;border-collapse:collapse}
+.keys-table th{background:rgba(0,188,212,.1);color:var(--cyan);padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.keys-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;color:#ccc}
+.keys-table .key-mono{font-family:monospace;color:var(--green);font-weight:700;font-size:14px;cursor:pointer;transition:.2s}
+.keys-table .key-mono:hover{text-shadow:0 0 10px rgba(0,230,118,.4)}
+.keys-table .price-col{color:#fff;font-weight:700}
+.keys-copy{background:none;border:none;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;transition:.3s;padding:4px 10px}
+.keys-copy:hover{text-shadow:0 0 12px rgba(0,230,118,.5);color:#fff}
+
+/* CONFIRM MODAL */
+.confirm-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1600;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(4px)}
+.confirm-modal.show{display:flex}
+.confirm-panel{background:#0f1525;border-radius:20px;max-width:400px;width:100%;padding:30px;position:relative;animation:fadeIn .3s;box-shadow:0 0 0 2px rgba(0,188,212,.3),0 0 40px rgba(0,188,212,.08)}
+.confirm-panel h2{color:var(--cyan);font-size:22px;margin-bottom:15px;text-align:center}
+.confirm-desc{color:#ccc;font-size:15px;margin-bottom:20px;text-align:center;line-height:1.6}
+.confirm-check{background:rgba(0,188,212,.05);border:1px solid rgba(0,188,212,.2);padding:15px;border-radius:12px;margin-bottom:25px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:.3s}
+.confirm-check:hover{background:rgba(0,188,212,.1)}
+.confirm-check input{margin-top:3px;accent-color:var(--cyan);width:16px;height:16px;cursor:pointer}
+.confirm-check .lbl-title{color:#fff;font-weight:700;font-size:14px;margin-bottom:4px;display:block}
+.confirm-check .lbl-sub{color:#888;font-size:12px;line-height:1.4;display:block}
+.confirm-actions{display:flex;gap:12px}
+.btn-cancel{flex:1;background:rgba(255,255,255,.05);border:none;color:#fff;padding:12px;border-radius:10px;font-weight:600;cursor:pointer;transition:.3s}
+.btn-cancel:hover{background:rgba(255,255,255,.1)}
+.btn-confirm{flex:1;background:linear-gradient(135deg,#00e676,#00bcd4);border:none;color:#000;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;transition:.3s;box-shadow:0 4px 15px rgba(0,230,118,.3)}
+.btn-confirm:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,230,118,.4)}
+
 /* CONTACT ADMIN */
 .contact-float{position:fixed;bottom:24px;left:24px;z-index:400;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .contact-btn{padding:12px 20px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:30px;font:600 14px 'Inter',sans-serif;cursor:pointer;box-shadow:0 4px 15px rgba(37,211,102,.3);transition:.3s;display:flex;align-items:center;gap:8px;text-decoration:none}
@@ -205,9 +248,13 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 <div class="topbar" id="topbar">
   <span class="user" id="topUser">📱</span>
   <div class="tbn">
-    <span class="balance" id="topBal">0đ</span>
+    <span class="balance" id="topBal">0đ
+      <div class="bal-dropdown" id="balDropdown">
+        <a href="#" onclick="event.preventDefault();openDeposit()">💰 Nạp tiền</a>
+        <a href="#" onclick="event.preventDefault();showKeys()">🔑 Key của tôi</a>
+      </div>
+    </span>
     <button onclick="openDeposit()">💰 Nạp</button>
-    <button onclick="showKeys()">🔑 Key</button>
     <button onclick="logout()">🚪</button>
   </div>
 </div>
@@ -239,39 +286,62 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
     <div class="trust-stat"><div class="trust-num" id="cntPlans">4</div><div class="trust-label">📦 Gói dịch vụ</div></div>
   </div>
 </section>
-<section class="bal-section" id="balSection">
-  <div class="bal-card">
-    <div class="bal-label">💰 Số dư tài khoản</div>
-    <div class="bal-amount"><span id="balDisplay">0</span><span> VNĐ</span></div>
-    <button class="deposit-btn" onclick="openDeposit()">➕ Nạp tiền</button>
-  </div>
-</section>
+
 
 <!-- PRICING (always visible) -->
 <section class="pricing">
   <div class="section-title">🛒 Chọn Gói</div>
   <p class="section-sub" id="pricingSub">Đăng nhập → Nạp tiền → Mua gói → Nhận key ngay!</p>
   <div class="plans">
-    <div class="plan glow-hover" onclick="buyPlan(1,6000,'1 bài')"><div class="plan-name">1 Bài</div><div class="plan-price">6K <span>VNĐ</span></div><div class="plan-dur">1 lượt</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li></ul><button class="buy-btn">MUA NGAY</button></div>
-    <div class="plan glow-hover" onclick="buyPlan(5,25000,'5 bài')"><div class="plan-name">5 Bài</div><div class="plan-price">25K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 5K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 17%</li></ul><button class="buy-btn">MUA NGAY</button></div>
-    <div class="popular-wrap"><div class="popular-badge">⭐ PHỔ BIẾN NHẤT</div><div class="plan glow-hover popular" onclick="buyPlan(10,40000,'10 bài')" style="width:100%"><div class="plan-name">10 Bài</div><div class="plan-price">40K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 20K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 33%</li></ul><button class="buy-btn">MUA NGAY</button></div></div>
-    <div class="plan glow-hover" onclick="buyPlan(999,60000,'VIP tuần')"><div class="plan-name">VIP Tuần</div><div class="plan-price">60K <span>VNĐ</span></div><div class="plan-dur">Không giới hạn 7 ngày</div><ul class="plan-list"><li>Chơi thoải mái</li><li>Không giới hạn</li><li>Ưu tiên hỗ trợ</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan glow-hover" onclick="buyPlan(1,6000,'1 bài (chỉ xem)')"><div class="plan-name">1 Bài (Chỉ Xem)</div><div class="plan-price">6K <span>VNĐ</span></div><div class="plan-dur">1 lượt highlight</div><ul class="plan-list"><li>🔍 Highlight đáp án</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan glow-hover" onclick="buyPlan(1,10000,'1 bài (auto)')"><div class="plan-name">1 Bài (Auto)</div><div class="plan-price">10K <span>VNĐ</span></div><div class="plan-dur">1 lượt trả lời</div><ul class="plan-list"><li>🔍 Highlight đáp án</li><li>🎯 Auto trả lời</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="popular-wrap"><div class="popular-badge">⭐ PHỔ BIẾN NHẤT</div><div class="plan glow-hover popular" onclick="buyPlan(5,39000,'5 bài')" style="width:100%"><div class="plan-name">5 Bài</div><div class="plan-price">39K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 11K</div><ul class="plan-list"><li>🔍 Highlight đáp án</li><li>🎯 Auto trả lời</li><li>💰 Tiết kiệm 22%</li></ul><button class="buy-btn">MUA NGAY</button></div></div>
+    <div class="plan glow-hover" onclick="buyPlan(999,149000,'VIP tuần')"><div class="plan-name">VIP Tuần</div><div class="plan-price">149K <span>VNĐ</span></div><div class="plan-dur">Không giới hạn 7 ngày</div><ul class="plan-list"><li>🔍 Highlight đáp án</li><li>🎯 Auto trả lời</li><li>♾️ Không giới hạn</li><li>⚡ Ưu tiên hỗ trợ</li></ul><button class="buy-btn">MUA NGAY</button></div>
   </div>
 </section>
 
-<!-- MY KEYS (logged in) -->
-<section class="mykeys" id="myKeysSection">
-  <h2>🔑 Key Của Tôi</h2>
-  <div id="myKeysList"></div>
-</section>
+<!-- KEYS MODAL -->
+<div class="keys-modal" id="keysModal" onclick="if(event.target===this)closeKeysModal()">
+  <div class="keys-panel">
+    <button class="keys-close" onclick="closeKeysModal()">✕</button>
+    <h2>🔑 Lịch Sử Mua Key</h2>
+    <div id="keysTableBody">⏳ Đang tải...</div>
+  </div>
+</div>
+
+<!-- CONFIRM BUY MODAL -->
+<div class="confirm-modal" id="confirmBuyModal" onclick="if(event.target===this)closeConfirmModal()">
+  <div class="confirm-panel">
+    <button class="keys-close" onclick="closeConfirmModal()">✕</button>
+    <h2>Xác Nhận Mua Gói</h2>
+    <div class="confirm-desc" id="confirmBuyDesc">Bạn đang mua gói <b>...</b> giá <b>...</b></div>
+    
+    <label class="confirm-check">
+      <input type="checkbox" id="checkLaptop">
+      <span>
+        <span class="lbl-title">Bạn xài trình duyệt máy tính (Laptop/PC)?</span>
+        <span class="lbl-sub">Tích vào để nhận kèm công cụ Dò giúp Server thu thập đáp án, đảm bảo Tool Auto hoạt động mượt mà.</span>
+      </span>
+    </label>
+    
+    <div class="confirm-actions">
+      <button class="btn-cancel" onclick="closeConfirmModal()">Hủy</button>
+      <button class="btn-confirm" onclick="executeBuy()">MUA NGAY</button>
+    </div>
+  </div>
+</div>
 
 <section class="how">
-  <div class="section-title">📖 Cách Dùng</div>
-  <div class="steps">
-    <div class="step glow-hover"><div class="step-num">1</div><b>Đăng ký</b><p>Tạo tài khoản</p></div>
-    <div class="step glow-hover"><div class="step-num">2</div><b>Nạp tiền</b><p>Quét QR</p></div>
-    <div class="step glow-hover"><div class="step-num">3</div><b>Mua gói</b><p>Nhanh gọn dễ xài</p></div>
-    <div class="step glow-hover"><div class="step-num">4</div><b>Nhận key</b><p>Tự động nhanh chóng</p></div>
+  <div class="section-title">📖 Hướng Dẫn Sử Dụng</div>
+  <p class="section-sub">Đọc kĩ các bước bên dưới để sử dụng tool hiệu quả!</p>
+  <div class="steps" style="flex-wrap:wrap;max-width:950px">
+    <div class="step glow-hover"><div class="step-num">1</div><b>Đăng ký</b><p>Tạo tài khoản tại trang này</p></div>
+    <div class="step glow-hover"><div class="step-num">2</div><b>Nạp tiền</b><p>Quét QR chuyển khoản</p></div>
+    <div class="step glow-hover"><div class="step-num">3</div><b>Mua gói</b><p>Chọn gói phù hợp & nhận key</p></div>
+    <div class="step glow-hover"><div class="step-num">4</div><b>Cài Bookmark</b><p>Vào trang <a href="install.html" style="color:var(--cyan)" target="_blank">Cài đặt</a> → kéo nút vào thanh bookmark</p></div>
+    <div class="step glow-hover"><div class="step-num">5</div><b>Cài Node.js (Cho DÒ)</b><p>Tải Node.js và chạy <code style="color:var(--green)">node proxy.js</code>. <a href="setup.html" style="color:var(--cyan)" target="_blank">Xem HD</a></p></div>
+    <div class="step glow-hover"><div class="step-num">6</div><b>Mở Quiz</b><p>Vào trang làm bài (Wayground/Quizizz) trên trình duyệt</p></div>
+    <div class="step glow-hover"><div class="step-num">6</div><b>Bấm Bookmark</b><p>Click bookmark → nhập key → tool tự động chạy!</p></div>
   </div>
 </section>
 
@@ -388,6 +458,13 @@ var _a=atob('NjliNDI3MzJiN2VjMjQxZGRjNjZhNTA2');
 var _b=atob('JDJhJDEwJG9ZQU5TelpRM2htMjdzVEREZWRkcy5EYmtLUVpPYnFQWmllRUovYmc4aS9obmgvMlNNczh1');
 var _phone='',_bal=0,_pendingBuy=null;
 
+/* Balance dropdown */
+function toggleBalMenu(){document.getElementById('balDropdown').classList.toggle('show');}
+function closeBalMenu(){document.getElementById('balDropdown').classList.remove('show');}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.balance'))closeBalMenu();
+});
+
 /* Scroll to top button */
 window.addEventListener('scroll',function(){
   var btn=document.getElementById('scrollTop');
@@ -398,7 +475,7 @@ window.addEventListener('scroll',function(){
 /* Escape key closes modals */
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
-    closeAuth();closeDeposit();
+    closeAuth();closeDeposit();closeKeysModal();
   }
 });
 
@@ -556,7 +633,6 @@ function enterApp(data){
   document.getElementById('loginWidget').style.display='none';
   document.getElementById('topUser').textContent='📱 '+_phone;
   document.getElementById('heroSection').classList.add('logged');
-  document.getElementById('balSection').style.display='block';
   document.getElementById('pricingSub').textContent='Chọn gói → trừ tiền tự động → nhận key ngay!';
   if(data&&data._users&&data._users[_phone]){
     _bal=data._users[_phone].balance||0;
@@ -566,16 +642,14 @@ function enterApp(data){
 }
 
 function updateBalUI(){
-  document.getElementById('balDisplay').textContent=_bal.toLocaleString('vi');
-  document.getElementById('topBal').textContent=_bal.toLocaleString('vi')+'đ';
+  var el=document.getElementById('topBal');
+  el.childNodes[0].textContent=_bal.toLocaleString('vi')+'đ';
 }
 
 function logout(){
   localStorage.removeItem('qh_phone');_phone='';_bal=0;
   document.getElementById('topbar').style.display='none';
   document.getElementById('loginWidget').style.display='block';
-  document.getElementById('balSection').style.display='none';
-  document.getElementById('myKeysSection').style.display='none';
   document.getElementById('heroSection').classList.remove('logged');
   document.getElementById('pricingSub').textContent='Đăng nhập → Nạp tiền → Mua gói → Nhận key ngay!';
 }
@@ -628,10 +702,26 @@ async function submitDeposit(){
 }
 
 /* Buy plan */
-async function buyPlan(uses,price,label){
+let _pendingBuyData = null;
+function closeConfirmModal(){document.getElementById('confirmBuyModal').classList.remove('show');}
+
+function buyPlan(uses,price,label){
   if(!_phone){_pendingBuy=[uses,price,label];openAuth();return;}
   if(_bal<price){alert('❌ Số dư không đủ!\n\nCần: '+price.toLocaleString('vi')+'đ\nSố dư: '+_bal.toLocaleString('vi')+'đ\n\nNạp thêm tiền nhé!');openDeposit();return;}
-  if(!confirm('Mua gói '+label+' — '+price.toLocaleString('vi')+'đ?'))return;
+  _pendingBuyData = {uses:uses, price:price, label:label};
+  document.getElementById('confirmBuyDesc').innerHTML = 'Bạn đang mua gói <b style="color:var(--cyan)">' + label + '</b> với giá <b style="color:var(--green)">' + price.toLocaleString('vi') + 'đ</b>';
+  document.getElementById('checkLaptop').checked = false;
+  document.getElementById('confirmBuyModal').classList.add('show');
+}
+
+async function executeBuy(){
+  if(!_pendingBuyData) return;
+  closeConfirmModal();
+  let uses = _pendingBuyData.uses;
+  let price = _pendingBuyData.price;
+  let label = _pendingBuyData.label;
+  let wantsHarvest = document.getElementById('checkLaptop').checked;
+  
   try{
     var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
     var j=await r.json();var d=j.record||{};
@@ -640,37 +730,48 @@ async function buyPlan(uses,price,label){
     var c='0123456789ABCDEF',p=function(){var s='';for(var i=0;i<4;i++)s+=c[Math.floor(Math.random()*16)];return s;};
     var nk='QH-'+p()+'-'+p()+'-'+p();
     if(!d._keys)d._keys={};
-    d._keys[nk]={active:true,phone:_phone,plan:label,uses:uses,created:Date.now(),expires:uses>=999?Date.now()+7*86400000:null};
+    d._keys[nk]={active:true,phone:_phone,plan:label,uses:uses,created:Date.now(),expires:uses>=999?Date.now()+7*86400000:null,withHarvest:wantsHarvest};
     if(!d._purchases)d._purchases=[];
-    d._purchases.push({phone:_phone,key:nk,plan:label,price:price,created:Date.now()});
+    d._purchases.push({phone:_phone,key:nk,plan:label,price:price,created:Date.now(),withHarvest:wantsHarvest});
     await fetch('https://api.jsonbin.io/v3/b/'+_a,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':_b},body:JSON.stringify(d)});
     _bal=d._users[_phone].balance;updateBalUI();
-    alert('🎉 Mua thành công!\n\n🔑 Key: '+nk+'\n\nĐã lưu trong mục Key của tôi!');
+    
+    let msg = '🎉 Mua thành công!\n\n🔑 Key: '+nk+'\n\nĐã lưu trong mục Key của tôi!';
+    if(wantsHarvest) msg += '\n\nLưu ý: Bạn chọn xài máy tính, hãy gửi kèm tool dò (node proxy.js) để cắm proxy cho Tool Auto hoạt động nhé!';
+    alert(msg);
     showKeys();
   }catch(e){alert('Lỗi: '+e.message);}
 }
 
-/* Show keys */
+/* Show keys modal */
+var _planPrices={'1 bài (chỉ xem)':'6,000đ','1 bài (auto)':'10,000đ','5 bài':'39,000đ','VIP tuần':'149,000đ'};
+function closeKeysModal(){document.getElementById('keysModal').classList.remove('show');}
 async function showKeys(){
   if(!_phone){openAuth();return;}
-  document.getElementById('myKeysSection').style.display='block';
-  document.getElementById('myKeysSection').scrollIntoView({behavior:'smooth'});
-  document.getElementById('myKeysList').innerHTML='<p style="color:#888;text-align:center">⏳ Đang tải...</p>';
+  document.getElementById('keysModal').classList.add('show');
+  document.getElementById('keysTableBody').innerHTML='<p style="color:#888;text-align:center">⏳ Đang tải...</p>';
   try{
     var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
     var j=await r.json();var d=j.record||{};var keys=d._keys||{};
     var my=Object.keys(keys).filter(function(k){return keys[k].phone===_phone;});
-    if(my.length===0){document.getElementById('myKeysList').innerHTML='<div class="no-keys">Chưa có key. Mua gói để nhận key!</div>';return;}
-    var html='';
+    if(my.length===0){document.getElementById('keysTableBody').innerHTML='<p style="color:#888;text-align:center">Chưa có key. Mua gói để nhận!</p>';return;}
+    var html='<table class="keys-table"><thead><tr><th>Key</th><th>Gói</th><th>Giá</th><th>Thời gian</th><th></th></tr></thead><tbody>';
     my.reverse().forEach(function(k){
-      var v=keys[k];var exp=v.expires?new Date(v.expires).toLocaleDateString('vi'):'Theo lượt';
-      html+='<div class="key-card"><div style="font-size:12px;color:#888">📦 '+v.plan+' — '+new Date(v.created).toLocaleDateString('vi')+'</div>';
-      html+='<div class="key-val">'+k+'</div>';
-      html+='<button class="copy-btn" onclick="navigator.clipboard.writeText(\''+k+'\');showToast(\'📋 Đã copy key!\')">📋 Copy Key</button>';
-      html+='<div class="meta">Hết hạn: '+exp+'</div></div>';
+      var v=keys[k];
+      var dt=new Date(v.created);
+      var timeStr=dt.toLocaleDateString('vi')+' '+dt.toLocaleTimeString('vi',{hour:'2-digit',minute:'2-digit'});
+      var price=_planPrices[v.plan]||'—';
+      html+='<tr>';
+      html+='<td class="key-mono" onclick="navigator.clipboard.writeText(\''+k+'\');showToast(\'📋 Đã copy key!\')">'+k+'</td>';
+      html+='<td>📦 '+v.plan+'</td>';
+      html+='<td class="price-col">'+price+'</td>';
+      html+='<td>'+timeStr+'</td>';
+      html+='<td><button class="keys-copy" onclick="navigator.clipboard.writeText(\''+k+'\');showToast(\'📋 Đã copy key!\')">Copy</button></td>';
+      html+='</tr>';
     });
-    document.getElementById('myKeysList').innerHTML=html;
-  }catch(e){document.getElementById('myKeysList').innerHTML='<p style="color:#f44336;text-align:center">Lỗi</p>';}
+    html+='</tbody></table>';
+    document.getElementById('keysTableBody').innerHTML=html;
+  }catch(e){document.getElementById('keysTableBody').innerHTML='<p style="color:#f44336;text-align:center">Lỗi tải dữ liệu</p>';}
 }
 
 /* Loading overlay */

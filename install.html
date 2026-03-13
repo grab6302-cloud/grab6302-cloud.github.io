@@ -1,44 +1,213 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>QSP Install</title>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QSP — Cài Đặt Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-body{background:#0a0a1a;color:#fff;font-family:'Segoe UI',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0}
-.box{background:linear-gradient(135deg,#16213e,#1a1a3e);padding:40px;border-radius:20px;max-width:600px;text-align:center;box-shadow:0 0 60px rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.2)}
-h1{background:linear-gradient(135deg,#00e676,#00bcd4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:28px;margin-bottom:5px}
-.sub{color:#888;font-size:12px;margin-bottom:20px}
-.bm{display:inline-block;padding:18px 35px;color:#000;font:bold 18px sans-serif;border-radius:14px;text-decoration:none;margin:10px;cursor:grab;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .2s}
-.bm:hover{transform:scale(1.05)}
-.bm1{background:linear-gradient(135deg,#f44336,#ff9800)}
-.bm2{background:linear-gradient(135deg,#00e676,#00bcd4)}
-.step{text-align:left;background:rgba(0,0,0,.3);padding:14px 20px;border-radius:10px;margin:8px 0;font-size:13px;border:1px solid rgba(255,255,255,.05)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a1a;color:#fff;font-family:'Inter',sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.box{background:linear-gradient(135deg,#0f1525,#1a1a3e);padding:40px;border-radius:24px;max-width:700px;width:100%;text-align:center;box-shadow:0 0 80px rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.15)}
+h1{background:linear-gradient(135deg,#00e676,#00bcd4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:32px;margin-bottom:4px}
+.ver{color:#555;font-size:12px;margin-bottom:28px;letter-spacing:2px}
+.modes{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:30px}
+.mode{flex:1;min-width:180px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px 16px;text-align:center;transition:.3s;display:flex;flex-direction:column}
+.mode:hover{border-color:rgba(0,188,212,.3);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.mode-icon{font-size:36px;margin-bottom:10px}
+.mode-name{font-weight:800;font-size:16px;margin-bottom:6px}
+.mode .desc{color:#888;font-size:12px;line-height:1.5;margin-bottom:18px;flex:1}
+.bm{display:inline-block;margin-top:auto;width:100%;padding:14px 0;color:#000;font:bold 15px 'Inter',sans-serif;border-radius:12px;text-decoration:none;cursor:grab;box-shadow:0 4px 18px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
+.bm:hover{transform:scale(1.05);box-shadow:0 6px 25px rgba(0,0,0,.5)}
+.bm-harvest{background:linear-gradient(135deg,#f44336,#ff9800)}
+.bm-highlight{background:linear-gradient(135deg,#00bcd4,#2196F3)}
+.bm-auto{background:linear-gradient(135deg,#00e676,#00bcd4)}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-bottom:10px}
+.tag-free{background:rgba(0,230,118,.15);color:#00e676;border:1px solid rgba(0,230,118,.2)}
+.tag-key{background:rgba(0,188,212,.15);color:#00bcd4;border:1px solid rgba(0,188,212,.2)}
+
+.divider{border-top:1px solid rgba(255,255,255,.06);margin:28px 0}
+.steps{text-align:left;max-width:500px;margin:0 auto}
+.step{background:rgba(0,0,0,.3);padding:14px 18px;border-radius:12px;margin:8px 0;font-size:13px;border:1px solid rgba(255,255,255,.04);line-height:1.6;color:#bbb}
 .step b{color:#00e676}
-.red{color:#f44336} .green{color:#00e676}
-.key-info{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);padding:10px;border-radius:8px;margin:15px 0;font-size:12px;color:#00e676}
+.step .red{color:#f44}
+.step .cyan{color:#00bcd4}
+.step .orange{color:#ff9800}
+.warn{background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);padding:12px 18px;border-radius:10px;font-size:12px;color:#ff9800;margin-top:20px;line-height:1.6}
+.note{color:#555;font-size:11px;margin-top:18px}
 </style>
 </head>
 <body>
 <div class="box">
 <h1>🎯 QSP ULTIMATE</h1>
-<p class="sub">v8 — Anti-Crack Edition</p>
+<p class="ver">v10 — CLOUD SYNC EDITION</p>
 
-<a class="bm bm1" id="harvest">💀 DÒ</a>
-<a class="bm bm2" id="play">🎯 CHƠI</a>
+<div class="modes">
+  <!-- HARVEST -->
+  <div class="mode">
+    <div class="mode-icon">💀</div>
+    <div class="tag tag-free">MIỄN PHÍ</div>
+    <div class="mode-name">DÒ ĐÁP ÁN</div>
+    <div class="desc">Mở <b>Firefox Ẩn Danh</b><br>Tool tự quét & lưu đáp án lên cloud</div>
+    <a class="bm bm-harvest" id="bmHarvest">💀 DÒ</a>
+  </div>
 
-<div class="key-info">🔑 Cần <b>LICENSE KEY</b> để sử dụng. Liên hệ admin.</div>
+  <!-- HIGHLIGHT -->
+  <div class="mode">
+    <div class="mode-icon">🔍</div>
+    <div class="tag tag-key">CẦN KEY</div>
+    <div class="mode-name">CHỈ XEM</div>
+    <div class="desc">Highlight đáp án đúng<br>Delay 6-10s ngẫu nhiên<br><b>Không auto click</b></div>
+    <a class="bm bm-highlight" id="bmHighlight">🔍 CHỈ XEM</a>
+  </div>
 
-<div class="step">
-<b class="red">💀 DÒ:</b> Chrome Guest → game → click bookmark → auto chạy
+  <!-- AUTO -->
+  <div class="mode">
+    <div class="mode-icon">🎯</div>
+    <div class="tag tag-key">CẦN KEY</div>
+    <div class="mode-name">FULL AUTO</div>
+    <div class="desc">Highlight + Auto click<br>Delay 6-10s ngẫu nhiên<br><b>Tự động hoàn toàn</b></div>
+    <a class="bm bm-auto" id="bmAuto">🎯 AUTO</a>
+  </div>
 </div>
-<div class="step">
-<b class="green">🎯 CHƠI:</b> Brave → game → click bookmark → Ctrl+H=Auto
+
+<div class="divider"></div>
+
+<div class="steps">
+  <div class="step"><b>Bước 1:</b> Mở trang này trên trình duyệt <span class="orange">(Khuyên dùng Firefox)</span></div>
+  <div class="step"><b>Bước 2 (Máy Tính):</b> <span class="orange">Kéo nút</span> bên trên thả vào <b>thanh Dấu Trang (Bookmark)</b> (Ctrl+Shift+B để hiện)</div>
+  <div class="step"><b>Bước 2 (Điện Thoại):</b> Copy đoạn code dài ngoằng của nút → Tạo 1 Bookmark mới → Paste code vào ô Địa chỉ (URL)</div>
+  <div class="step"><b>Bước 3 <span class="red">(DÒ):</span></b> Mở <b>Tab Ẩn Danh</b> (Ctrl+Shift+P) → mở quiz → click bookmark <span class="red">💀 DÒ</span> → chờ đáp án tự lưu</div>
+  <div class="step"><b>Bước 4 <span class="cyan">(CHƠI):</span></b> Firefox → mở quiz → click bookmark <span class="cyan">🔍 CHỈ XEM</span> hoặc <span style="color:#00e676">🎯 AUTO</span></div>
 </div>
-<div class="step">
-⚡ Data realtime qua server. Không thể crack — logic nằm 100% trên server!
+
+<div class="warn">
+  ⚠️ <b>Lưu ý Quan Trọng:</b><br>
+  - Các công cụ trên hoạt động trực tiếp qua Cloud, <b>không cần tải hay cài đặt thêm phần mềm gì</b>!<br>
+  - Khi dùng <b>💀 DÒ</b>, bắt buộc phải mở bằng <b>Tab Ẩn Danh</b> (Incognito / Private Window) để tránh xung đột tài khoản với tab làm bài thật.
 </div>
+
+<p class="note">© QSP Ultimate v10 — Data synced via cloud</p>
 </div>
 
 <script>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+// Generate Serverless Bookmarklet URLs
+var B_ID = '69b42732b7ec241ddc66a506';
+var B_KEY = '$2a$10$oYANSzZQ3hm27sTDDedds.DbkKQZObqPZieEJ/bg8i/hnh/2SMs8u';
+
+function getBM(mode) {
+  var code = `javascript:(function(){
+    var MODE='${mode}', B_ID='${B_ID}', B_KEY='${B_KEY}';
+    var k=localStorage.getItem('qsp_key');
+    if(!k){ k=prompt('🔑 Nhập License Key:'); if(!k)return; }
+    
+    var p=document.createElement('div');
+    p.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:#1a1a2e;color:#0f0;padding:12px;border-radius:12px;font:bold 13px monospace;border:2px solid #00e676';
+    p.innerText='⏳ Đang load...'; document.body.appendChild(p);
+    function log(m,c){ p.innerText=m; if(c) p.style.borderColor=c;}
+
+    fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}}).then(r=>r.json()).then(j=>{
+      var d=j.record||j; var keys=d._keys||{}; var ans=d._answers||{};
+      
+      var valid=false;
+      if(keys[k] && keys[k].active && (!keys[k].expires || Date.now()<=keys[k].expires)){
+        valid=true; localStorage.setItem('qsp_key',k);
+        
+        /* Chống vượt rào: Nếu tải mode AUTO nhưng xài key gói Chỉ Xem */
+        if(MODE==='auto' && keys[k].plan && keys[k].plan.toLowerCase().indexOf('chỉ xem')>-1){
+          MODE='highlight'; log('⚠️ Gói của bạn chỉ chạy Highlight!','#ff9800');
+        } else {
+          log('✅ '+(MODE==='auto'?'🎯 AUTO':'🔍 CHỈ XEM')+' | Key OK','#00e676');
+        }
+      }
+      
+      if(!valid){ log('❌ Key không hợp lệ!','#f44'); localStorage.removeItem('qsp_key'); return; }
+
+      var _lq='';
+      function tick(){
+        try {
+          var qs=document.querySelectorAll('[class*="question"], [data-testid*="question"], h1, h2, h3, .prompt');
+          var qE=null; qs.forEach(e=>{if(e.textContent.trim().length>10 && !qE)qE=e});
+          if(!qE)return; var q=qE.textContent.trim(); if(q===_lq)return; _lq=q;
+          
+          var os=document.querySelectorAll('[class*="answer"], [class*="option"], [role="button"], button[class*="btn"]');
+          var ot=[]; os.forEach(e=>ot.push(e.textContent.trim()));
+          
+          var a=null; var q_strip=q.replace(/<[^>]*>/g,'').replace(/\\s+/g,' ').trim().toLowerCase();
+          if(ans[q_strip]) a=ans[q_strip];
+          else {
+            var w=q_strip.split(' ').filter(x=>x.length>2); var bS=0;
+            for(var key in ans){
+              var m=0; w.forEach(wx=>{if(key.indexOf(wx)>-1)m++;});
+              var s=w.length>0 ? m/w.length : 0;
+              if(s>bS && s>0.6){ bS=s; a=ans[key]; }
+            }
+          }
+          
+          if(a){
+            var idx=-1;
+            for(var i=0;i<ot.length;i++){
+              var ots=ot[i].replace(/<[^>]*>/g,'').replace(/\\s+/g,' ').trim().toLowerCase();
+              for(var val of a){
+                if(ots===val || ots.indexOf(val)>-1 || val.indexOf(ots)>-1){idx=i; break;}
+              }
+              if(idx>-1) break;
+            }
+            if(idx>-1 && idx<os.length){
+              var dl=6000+Math.floor(Math.random()*4000); log('⏱️ Chờ '+(dl/1000).toFixed(1)+'s...','#ff9800');
+              setTimeout(()=>{
+                os[idx].style.cssText+=';box-shadow:0 0 25px #00e676!important;border:3px solid #00e676!important;position:relative;z-index:9999;transition:.3s;';
+                log('✅ Đáp án #'+(idx+1),'#00e676');
+                if(MODE==='auto'){
+                  setTimeout(()=>{os[idx].click();log('🖱️ Đã click!','#00e676');}, 500+Math.floor(Math.random()*1500));
+                }
+              }, dl);
+            } else { log('❓ Chưa có đáp án','#ff5722'); }
+          } else { log('❓ Chưa có đáp án','#ff5722'); }
+        } catch(e){}
+      }
+      setInterval(tick,1500);
+    }).catch(e=>log('❌ Lỗi kết nối server!','#f44'));
+  })();`;
+  
+  // Nén bookmarklet text format
+  return code.replace(/\n\s+/g, '');
+}
+
+var hCode = `javascript:(function(){
+  var B_ID='${B_ID}', B_KEY='${B_KEY}';
+  var p=document.createElement('div');
+  p.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:#1a1a2e;color:#ff9800;padding:12px;border-radius:12px;font:bold 13px monospace;border:2px solid #ff9800';
+  p.innerText='💀 DÒ: KHỞI ĐỘNG...'; document.body.appendChild(p);
+
+  var _lh='', ansCache=null;
+  function tick(){
+    try {
+      var qs=document.querySelectorAll('[class*="question"], [data-testid*="question"], h1, h2, h3, .prompt');
+      var qE=null; qs.forEach(e=>{if(e.textContent.trim().length>10 && !qE)qE=e});
+      if(!qE)return; var q=qE.textContent.trim(); if(q===_lh)return;
+      
+      var cs=document.querySelectorAll('[class*="correct"], [data-correct="true"], .right-answer, [style*="green"], [class*="success"]');
+      if(cs.length===0)return; _lh=q;
+      
+      var as=[]; cs.forEach(e=>as.push(e.textContent.trim().toLowerCase()));
+      var sq=q.replace(/<[^>]*>/g,'').replace(/\\s+/g,' ').trim().toLowerCase();
+      
+      p.innerText='☁️ Đang lưu lên Cloud...';
+      fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}})
+      .then(r=>r.json()).then(j=>{
+        var d=j.record||j; if(!d._answers)d._answers={};
+        if(!d._answers[sq]) d._answers[sq]=[];
+        as.forEach(a=>{ var sa=a.replace(/<[^>]*>/g,'').replace(/\\s+/g,' ').trim(); if(d._answers[sq].indexOf(sa)<0) d._answers[sq].push(sa); });
+        
+        fetch('https://api.jsonbin.io/v3/b/'+B_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':B_KEY},body:JSON.stringify(d)})
+        .then(()=>{ p.innerText='💀 Đã lưu câu hỏi!'; setTimeout(()=>p.innerText='💀 DÒ: Đang chờ...',2000); });
+      });
+    } catch(e){}
+  }
+  setInterval(tick,1500);
+})();`.replace(/\n\s+/g, '');
+
+document.getElementById('bmHarvest').href = hCode;
+document.getElementById('bmHighlight').href = getBM('highlight');
+document.getElementById('bmAuto').href = getBM('auto');
 </script>
 </body>
 </html>
