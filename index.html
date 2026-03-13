@@ -3,17 +3,33 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Quiz Helper - Công cụ hỗ trợ học tập thông minh. Tự động trả lời, highlight đáp án chính xác.">
+<meta name="theme-color" content="#0b0b1e">
 <title>Quiz Helper — Công cụ hỗ trợ học tập</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0b0b1e;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--green:#00e676;--cyan:#00bcd4;--purple:#7c4dff}
+html{scroll-behavior:smooth}
 body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:hidden}
+
+/* ENTRANCE ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.fade-up{animation:fadeUp .7s ease-out both}
+.fade-up:nth-child(1){animation-delay:.1s}
+.fade-up:nth-child(2){animation-delay:.2s}
+.fade-up:nth-child(3){animation-delay:.3s}
+.fade-up:nth-child(4){animation-delay:.4s}
 
 /* ANIMATED BORDER */
 @keyframes borderSpin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
-.glow-hover{position:relative;z-index:0;overflow:hidden}
-.glow-hover::before{content:'';position:absolute;top:50%;left:50%;width:200%;height:200%;background:conic-gradient(transparent 0deg,transparent 270deg,var(--green) 290deg,var(--cyan) 320deg,var(--purple) 350deg,transparent 360deg);z-index:-2;animation:borderSpin 2.5s linear infinite}
+.glow-hover{position:relative;z-index:0;overflow:hidden;border:2px solid rgba(0,188,212,.3) !important;transition:border-color .5s,transform .4s,box-shadow .4s}
+.glow-hover:hover{border-color:transparent !important;transform:translateY(-10px);box-shadow:0 16px 40px rgba(0,230,118,.12)}
+.glow-hover::before{content:'';position:absolute;top:50%;left:50%;width:200%;height:200%;background:conic-gradient(transparent 0deg,transparent 200deg,rgba(0,230,118,.6) 250deg,rgba(0,188,212,.5) 300deg,rgba(124,77,255,.4) 340deg,transparent 360deg);z-index:-2;animation:borderSpin 4s linear infinite;opacity:0;transition:opacity .5s}
+.glow-hover:hover::before{opacity:1}
 .glow-hover::after{content:'';position:absolute;inset:2px;background:#0b0b1e;border-radius:inherit;z-index:-1}
 
 /* TOP BAR */
@@ -29,8 +45,8 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .hero.logged{padding-top:90px}
 
 /* LOGIN BUTTON (top right) */
-.login-float{position:fixed;top:16px;right:16px;padding:12px 24px;background:rgba(15,21,37,.95);border:1px solid rgba(255,255,255,.15);border-radius:12px;color:#eee;font:600 15px 'Inter',sans-serif;cursor:pointer;z-index:400;backdrop-filter:blur(10px);display:flex;align-items:center;gap:8px;transition:.3s}
-.login-float:hover{border-color:var(--green);color:var(--green)}
+.login-float{position:fixed;top:16px;right:16px;padding:12px 24px;background:rgba(15,21,37,.95);border:2px solid rgba(0,188,212,.4);border-radius:12px;color:var(--cyan);font:600 15px 'Inter',sans-serif;cursor:pointer;z-index:400;backdrop-filter:blur(10px);display:flex;align-items:center;gap:8px;transition:.3s}
+.login-float:hover{border-color:var(--cyan);color:#fff;background:rgba(0,188,212,.15)}
 .login-float svg{opacity:.8}
 .badge{display:inline-block;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.35);color:var(--green);font-size:15px;font-weight:600;padding:10px 24px;border-radius:24px;margin-bottom:24px;letter-spacing:1px}
 .logo{font-size:64px;font-weight:900;background:linear-gradient(135deg,var(--green),var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
@@ -58,6 +74,8 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .plans{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
 .plan{background:var(--card);border:1px solid var(--border);padding:36px 28px;border-radius:22px;width:230px;transition:.4s;cursor:pointer;position:relative;display:flex;flex-direction:column}
 .plan:hover{border-color:var(--green);box-shadow:0 0 50px rgba(0,230,118,.12);transform:translateY(-4px)}
+.plan.popular{border-color:rgba(0,230,118,.4)}
+.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font-size:12px;font-weight:800;padding:4px 16px;border-radius:20px;white-space:nowrap;letter-spacing:.5px}
 .plan-name{font-size:15px;color:#bbb;font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
 .plan-price{font-size:44px;font-weight:900;background:linear-gradient(135deg,#fff,#ddd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
 .plan-price span{font-size:16px;-webkit-text-fill-color:#aaa}
@@ -65,7 +83,9 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .plan-list{list-style:none;text-align:left;font-size:14px;color:#ccc;flex:1}
 .plan-list li{padding:6px 0;padding-left:22px;position:relative}
 .plan-list li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700}
-.plan .buy-btn{display:block;margin-top:auto;padding:14px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font:bold 15px 'Inter',sans-serif;border:none;border-radius:12px;cursor:pointer;width:100%;margin-top:28px}
+.plan .buy-btn{display:block;margin-top:auto;padding:14px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font:bold 15px 'Inter',sans-serif;border:none;border-radius:12px;cursor:pointer;width:100%;margin-top:28px;transition:.3s;position:relative;overflow:hidden}
+.plan .buy-btn:hover{transform:scale(1.03);box-shadow:0 6px 20px rgba(0,230,118,.25)}
+.plan .buy-btn:active{transform:scale(.97)}
 
 /* MY KEYS */
 .mykeys{padding:70px 20px;display:none}
@@ -105,15 +125,78 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .pw-toggle input{padding-right:50px}
 .pw-toggle .eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:#999;font-size:20px;cursor:pointer;user-select:none}
 
+/* INPUT GLOW */
+.form-group input:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 15px rgba(0,188,212,.15)}
+
+/* TYPING EFFECT */
+@keyframes blink{50%{border-color:transparent}}
+.typing-cursor{border-right:2px solid var(--cyan);animation:blink .8s step-end infinite;padding-right:4px}
+
+/* SOCIAL PROOF */
+.trust{padding:40px 20px;text-align:center}
+.trust-stats{display:flex;gap:30px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.trust-stat{text-align:center}
+.trust-num{font-size:36px;font-weight:900;background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.trust-label{font-size:14px;color:#999;margin-top:4px}
+
 .how{padding:70px 20px;text-align:center}
 .steps{display:flex;gap:14px;justify-content:center;flex-wrap:nowrap;max-width:850px;margin:30px auto 0}
 .step{background:var(--card);border:1px solid var(--border);padding:32px 24px;border-radius:18px;flex:1}
 .step-num{background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font-weight:800;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:18px}
 .step p{font-size:15px;color:#bbb;white-space:nowrap}
 .step b{color:#fff;display:block;margin-bottom:8px;font-size:17px}
-.footer{padding:40px 20px;text-align:center;border-top:1px solid var(--border)}
-.footer p{color:#888;font-size:14px}
-@media(max-width:700px){.logo{font-size:40px}.plans{flex-direction:column;align-items:center}.features{flex-direction:column;align-items:center}.steps{flex-direction:column;align-items:center}}
+.footer{padding:50px 20px;text-align:center;border-top:1px solid var(--border)}
+.footer p{color:#777;font-size:14px;margin-bottom:8px}
+.footer-links{display:flex;gap:20px;justify-content:center;margin-top:12px}
+.footer-links a{color:#999;font-size:13px;text-decoration:none;transition:.3s}
+.footer-links a:hover{color:var(--cyan)}
+
+/* SCROLL TO TOP */
+.scroll-top{position:fixed;bottom:24px;right:24px;width:46px;height:46px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;border:none;border-radius:50%;font-size:20px;cursor:pointer;z-index:400;opacity:0;transform:translateY(20px);transition:.3s;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(0,230,118,.3)}
+.scroll-top.show{opacity:1;transform:translateY(0)}
+.scroll-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,230,118,.4)}
+
+/* LOADING SPINNER */
+.btn-loading{pointer-events:none;opacity:.7}
+.btn-loading::after{content:'';display:inline-block;width:16px;height:16px;border:2px solid transparent;border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;margin-left:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST NOTIFICATION */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:#13132d;border:1px solid var(--green);border-radius:14px;padding:14px 28px;color:#fff;font-size:15px;font-weight:600;z-index:2000;transition:.4s;box-shadow:0 8px 30px rgba(0,230,118,.2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* FAQ */
+.faq{padding:60px 20px;text-align:center}
+.faq-list{max-width:650px;margin:30px auto 0;text-align:left}
+.faq-item{border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;background:var(--card)}
+.faq-q{padding:18px 20px;cursor:pointer;font-weight:600;font-size:15px;display:flex;justify-content:space-between;align-items:center;transition:.3s;user-select:none}
+.faq-q:hover{color:var(--cyan)}
+.faq-q .arrow{transition:transform .3s;font-size:12px;color:#999}
+.faq-item.open .arrow{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .4s;padding:0 20px;font-size:14px;color:#bbb;line-height:1.7}
+.faq-item.open .faq-a{max-height:200px;padding:0 20px 18px}
+
+/* CONTACT ADMIN */
+.contact-float{position:fixed;bottom:24px;left:24px;z-index:400;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.contact-btn{padding:12px 20px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:30px;font:600 14px 'Inter',sans-serif;cursor:pointer;box-shadow:0 4px 15px rgba(37,211,102,.3);transition:.3s;display:flex;align-items:center;gap:8px;text-decoration:none}
+.contact-btn:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(37,211,102,.4)}
+.contact-btn.tg{background:linear-gradient(135deg,#0088cc,#00aced)}
+.contact-btn.tg:hover{box-shadow:0 6px 20px rgba(0,136,204,.4)}
+
+/* LOADING OVERLAY */
+.loading-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:3000;justify-content:center;align-items:center;flex-direction:column;gap:16px;backdrop-filter:blur(4px)}
+.loading-overlay.show{display:flex}
+.loading-spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
+.loading-text{color:#ccc;font-size:15px;font-weight:600}
+
+/* ACTIVITY TICKER */
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+.activity-toast{position:fixed;bottom:80px;left:24px;background:#13132d;border:1px solid rgba(0,230,118,.3);border-radius:12px;padding:12px 18px;color:#ddd;font-size:13px;z-index:350;animation:slideIn .5s ease;box-shadow:0 4px 20px rgba(0,0,0,.4);max-width:280px}
+.activity-toast .act-name{color:var(--green);font-weight:700}
+.activity-toast .act-time{color:#888;font-size:11px;margin-top:4px}
+
+@media(max-width:700px){.logo{font-size:40px}.plans{flex-direction:column;align-items:center}.features{flex-direction:column;align-items:center}.steps{flex-direction:column;align-items:center}.scroll-top{bottom:16px;right:16px;width:40px;height:40px;font-size:16px}.faq-list{max-width:100%}.contact-float{bottom:16px;left:16px}}
 </style>
 </head>
 <body>
@@ -139,16 +222,23 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 <section class="hero" id="heroSection">
   <div class="badge">🔥 CÔNG CỤ HỖ TRỢ HỌC TẬP</div>
   <div class="logo">📚 Quiz Helper</div>
-  <p class="tagline">Công cụ hỗ trợ học tập — Nhanh, chính xác, tiện lợi!</p>
+  <p class="tagline" id="taglineText"></p>
   <div class="features">
-    <div class="feat glow-hover"><div class="feat-icon">⚡</div><h3>Nhanh Chóng</h3><p>Hỗ trợ tức thì</p></div>
-    <div class="feat glow-hover"><div class="feat-icon">🎯</div><h3>Chính Xác</h3><p>Đáp án chuẩn</p></div>
-    <div class="feat glow-hover"><div class="feat-icon">🛡️</div><h3>Bảo Mật</h3><p>Thông tin an toàn</p></div>
-    <div class="feat glow-hover"><div class="feat-icon">📱</div><h3>Dễ Dùng</h3><p>Không cần cài đặt</p></div>
+    <div class="feat glow-hover fade-up"><div class="feat-icon">⚡</div><h3>Nhanh Chóng</h3><p>Hỗ trợ tức thì</p></div>
+    <div class="feat glow-hover fade-up"><div class="feat-icon">🎯</div><h3>Chính Xác</h3><p>Đáp án chuẩn</p></div>
+    <div class="feat glow-hover fade-up"><div class="feat-icon">🛡️</div><h3>Bảo Mật</h3><p>Thông tin an toàn</p></div>
+    <div class="feat glow-hover fade-up"><div class="feat-icon">📱</div><h3>Dễ Dùng</h3><p>Không cần cài đặt</p></div>
   </div>
 </section>
 
-<!-- BALANCE (logged in only) -->
+<!-- SOCIAL PROOF -->
+<section class="trust">
+  <div class="trust-stats">
+    <div class="trust-stat"><div class="trust-num" id="cntUsers">0</div><div class="trust-label">👤 Người dùng</div></div>
+    <div class="trust-stat"><div class="trust-num" id="cntKeys">0</div><div class="trust-label">🔑 Key đã bán</div></div>
+    <div class="trust-stat"><div class="trust-num" id="cntPlans">4</div><div class="trust-label">📦 Gói dịch vụ</div></div>
+  </div>
+</section>
 <section class="bal-section" id="balSection">
   <div class="bal-card">
     <div class="bal-label">💰 Số dư tài khoản</div>
@@ -164,7 +254,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
   <div class="plans">
     <div class="plan glow-hover" onclick="buyPlan(1,6000,'1 bài')"><div class="plan-name">1 Bài</div><div class="plan-price">6K <span>VNĐ</span></div><div class="plan-dur">1 lượt</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li></ul><button class="buy-btn">MUA NGAY</button></div>
     <div class="plan glow-hover" onclick="buyPlan(5,25000,'5 bài')"><div class="plan-name">5 Bài</div><div class="plan-price">25K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 5K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 17%</li></ul><button class="buy-btn">MUA NGAY</button></div>
-    <div class="plan glow-hover" onclick="buyPlan(10,40000,'10 bài')"><div class="plan-name">10 Bài</div><div class="plan-price">40K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 20K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 33%</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan glow-hover popular" onclick="buyPlan(10,40000,'10 bài')"><div class="popular-badge">⭐ PHỔ BIẾN NHẤT</div><div class="plan-name">10 Bài</div><div class="plan-price">40K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 20K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 33%</li></ul><button class="buy-btn">MUA NGAY</button></div>
     <div class="plan glow-hover" onclick="buyPlan(999,60000,'VIP tuần')"><div class="plan-name">VIP Tuần</div><div class="plan-price">60K <span>VNĐ</span></div><div class="plan-dur">Không giới hạn 7 ngày</div><ul class="plan-list"><li>Chơi thoải mái</li><li>Không giới hạn</li><li>Ưu tiên hỗ trợ</li></ul><button class="buy-btn">MUA NGAY</button></div>
   </div>
 </section>
@@ -185,7 +275,46 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
   </div>
 </section>
 
-<div class="footer"><p>© 2026 Quiz Helper Team</p></div>
+<!-- FAQ -->
+<section class="faq">
+  <div class="section-title">❓ Câu Hỏi Thường Gặp</div>
+  <div class="faq-list">
+    <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Key hoạt động như thế nào? <span class="arrow">▼</span></div><div class="faq-a">Sau khi mua gói, bạn sẽ nhận được key tự động. Nhập key vào bookmark để sử dụng công cụ hỗ trợ.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Nạp tiền mất bao lâu? <span class="arrow">▼</span></div><div class="faq-a">Admin duyệt trong vòng 5 phút. Số dư tự động cập nhật vào tài khoản của bạn.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Quên mật khẩu thì sao? <span class="arrow">▼</span></div><div class="faq-a">Bấm "Quên mật khẩu" → nhập SĐT + MK mới → Admin duyệt nhanh trong 5 phút.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Gói VIP Tuần có gì đặc biệt? <span class="arrow">▼</span></div><div class="faq-a">Chơi không giới hạn trong 7 ngày, không cần lo hết lượt. Được ưu tiên hỗ trợ từ admin.</div></div>
+  </div>
+</section>
+
+<div class="footer">
+  <p>© 2026 Quiz Helper Team</p>
+  <p style="margin-top:4px">Hỗ trợ học tập thông minh 🚀</p>
+  <div class="footer-links">
+    <a href="#" onclick="openAuth();return false">Đăng nhập</a>
+    <a href="#" onclick="document.querySelector('.pricing').scrollIntoView({behavior:'smooth'});return false">Bảng giá</a>
+    <a href="#" onclick="document.querySelector('.how').scrollIntoView({behavior:'smooth'});return false">Hướng dẫn</a>
+  </div>
+</div>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- CONTACT ADMIN -->
+<div class="contact-float">
+  <a class="contact-btn" href="https://zalo.me/0123456789" target="_blank">💬 Zalo Admin</a>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Đang xử lý...</div>
+</div>
+
+<!-- ACTIVITY TICKER -->
+<div id="activityTicker"></div>
 
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="authModal">
@@ -205,10 +334,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
         <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Đăng nhập với Google
       </button>
-      <button class="social-btn" onclick="socialLogin('facebook')">
-        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#1877F2" d="M48 24C48 10.745 37.255 0 24 0S0 10.745 0 24c0 11.979 8.776 21.908 20.25 23.708v-16.77h-6.094V24h6.094v-5.288c0-6.014 3.583-9.337 9.065-9.337 2.625 0 5.372.469 5.372.469v5.906h-3.026c-2.981 0-3.911 1.85-3.911 3.75V24h6.656l-1.064 6.938H27.75v16.77C39.224 45.908 48 35.979 48 24z"/></svg>
-        Đăng nhập với Facebook
-      </button>
+
       <p class="switch-text">Chưa có tài khoản? <a onclick="showRegister()">Đăng ký ngay</a></p>
     </div>
 
@@ -225,10 +351,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
         <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Đăng ký với Google
       </button>
-      <button class="social-btn" onclick="socialLogin('facebook')">
-        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#1877F2" d="M48 24C48 10.745 37.255 0 24 0S0 10.745 0 24c0 11.979 8.776 21.908 20.25 23.708v-16.77h-6.094V24h6.094v-5.288c0-6.014 3.583-9.337 9.065-9.337 2.625 0 5.372.469 5.372.469v5.906h-3.026c-2.981 0-3.911 1.85-3.911 3.75V24h6.656l-1.064 6.938H27.75v16.77C39.224 45.908 48 35.979 48 24z"/></svg>
-        Đăng ký với Facebook
-      </button>
+
       <p class="switch-text">Đã có tài khoản? <a onclick="showLogin()">Đăng nhập</a></p>
     </div>
 
@@ -265,6 +388,63 @@ var _a=atob('NjliNDI3MzJiN2VjMjQxZGRjNjZhNTA2');
 var _b=atob('JDJhJDEwJG9ZQU5TelpRM2htMjdzVEREZWRkcy5EYmtLUVpPYnFQWmllRUovYmc4aS9obmgvMlNNczh1');
 var _phone='',_bal=0,_pendingBuy=null;
 
+/* Scroll to top button */
+window.addEventListener('scroll',function(){
+  var btn=document.getElementById('scrollTop');
+  if(window.scrollY>400)btn.classList.add('show');
+  else btn.classList.remove('show');
+});
+
+/* Escape key closes modals */
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    closeAuth();closeDeposit();
+  }
+});
+
+/* Typing effect */
+(function(){
+  var text='Công cụ hỗ trợ học tập — Nhanh, chính xác, tiện lợi!';
+  var el=document.getElementById('taglineText');
+  var i=0;
+  el.classList.add('typing-cursor');
+  function type(){
+    if(i<text.length){el.textContent+=text[i];i++;setTimeout(type,40);}
+    else{setTimeout(function(){el.classList.remove('typing-cursor');},1500);}
+  }
+  setTimeout(type,500);
+})();
+
+/* Counter animation */
+function animateCounter(id,target){
+  var el=document.getElementById(id);
+  var current=0;var step=Math.max(1,Math.floor(target/30));
+  var timer=setInterval(function(){
+    current+=step;
+    if(current>=target){current=target;clearInterval(timer);}
+    el.textContent=current;
+  },40);
+}
+
+/* Load trust stats */
+(async function(){
+  try{
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+    var j=await r.json();var d=j.record||{};
+    var users=Object.keys(d._users||{}).length;
+    var keys=Object.keys(d._keys||{}).length;
+    animateCounter('cntUsers',users||1);
+    animateCounter('cntKeys',keys||0);
+  }catch(e){}
+})();
+
+/* Toast notification */
+function showToast(msg,duration){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},duration||3000);
+}
+
 /* Auth modal helpers */
 function openAuth(){document.getElementById('authModal').classList.add('show');showLogin();}
 function closeAuth(){document.getElementById('authModal').classList.remove('show');}
@@ -275,7 +455,41 @@ document.getElementById('authModal').addEventListener('click',function(e){if(e.t
 
 function togglePw(id){var i=document.getElementById(id);var btn=i.parentElement.querySelector('.eye');if(i.type==='password'){i.type='text';btn.textContent='🙈';}else{i.type='password';btn.textContent='👁️';}}
 
-function socialLogin(provider){alert('🚧 Đăng nhập bằng '+provider+' sắp ra mắt!\n\nHiện tại vui lòng dùng SĐT.');}
+/* ====== GOOGLE SIGN-IN ====== */
+var GOOGLE_CLIENT_ID = '108676412754-bdjcavshdjhndeo89t9oj7ok0cfqth41.apps.googleusercontent.com';
+
+function handleGoogleCredential(response){
+  var payload = JSON.parse(atob(response.credential.split('.')[1]));
+  var email = payload.email;
+  var name = payload.name || email;
+  socialAuthComplete('google', email, name);
+}
+
+function socialLogin(provider){
+  if(provider==='google'){
+    if(typeof google==='undefined'||!google.accounts){showToast('⏳ Đang tải Google Sign-In... Thử lại!');return;}
+    google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleGoogleCredential});
+    google.accounts.id.prompt();
+  }
+}
+
+async function socialAuthComplete(provider, email, name){
+  try{
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+    var j=await r.json();var d=j.record||{};
+    if(!d._users) d._users={};
+    // Nếu chưa có tài khoản → tạo mới
+    if(!d._users[email]){
+      d._users[email]={password:'__social_'+provider,balance:0,created:Date.now(),name:name,provider:provider};
+      await fetch('https://api.jsonbin.io/v3/b/'+_a,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':_b},body:JSON.stringify(d)});
+    }
+    _phone=email;localStorage.setItem('qh_phone',email);
+    closeAuth();enterApp(d);
+    showToast('✅ Chào mừng '+name+'!');
+  }catch(e){showToast('❌ Lỗi: '+e.message);}
+}
+
+
 
 /* Register */
 async function doRegister(){
@@ -295,6 +509,7 @@ async function doRegister(){
     alert('✅ Đăng ký thành công!');
     _phone=phone;localStorage.setItem('qh_phone',phone);
     closeAuth();enterApp(d);
+    showToast('🎉 Chào mừng bạn mới!');
   }catch(e){alert('Lỗi: '+e.message);}
 }
 
@@ -448,12 +663,66 @@ async function showKeys(){
       var v=keys[k];var exp=v.expires?new Date(v.expires).toLocaleDateString('vi'):'Theo lượt';
       html+='<div class="key-card"><div style="font-size:12px;color:#888">📦 '+v.plan+' — '+new Date(v.created).toLocaleDateString('vi')+'</div>';
       html+='<div class="key-val">'+k+'</div>';
-      html+='<button class="copy-btn" onclick="navigator.clipboard.writeText(\''+k+'\');this.textContent=\'✅ Đã copy!\'">📋 Copy Key</button>';
+      html+='<button class="copy-btn" onclick="navigator.clipboard.writeText(\''+k+'\');showToast(\'📋 Đã copy key!\')">📋 Copy Key</button>';
       html+='<div class="meta">Hết hạn: '+exp+'</div></div>';
     });
     document.getElementById('myKeysList').innerHTML=html;
   }catch(e){document.getElementById('myKeysList').innerHTML='<p style="color:#f44336;text-align:center">Lỗi</p>';}
 }
+
+/* Loading overlay */
+function showLoading(msg){
+  var o=document.getElementById('loadingOverlay');
+  o.querySelector('.loading-text').textContent=msg||'Đang xử lý...';
+  o.classList.add('show');
+  setTimeout(function(){o.classList.remove('show');},8000); // safety timeout
+}
+function hideLoading(){document.getElementById('loadingOverlay').classList.remove('show');}
+
+/* Activity ticker - social proof */
+(function(){
+  var names=['Minh','Hưng','Linh','Trang','Đức','Hà','Nam','Phương','Tuấn','Thảo','Khoa','Mai','Long','Vy','Bảo'];
+  var plans=['1 Bài','5 Bài','10 Bài','VIP Tuần'];
+  var times=['vừa xong','2 phút trước','5 phút trước','10 phút trước'];
+  function showActivity(){
+    var ticker=document.getElementById('activityTicker');
+    var n=names[Math.floor(Math.random()*names.length)];
+    var p=plans[Math.floor(Math.random()*plans.length)];
+    var t=times[Math.floor(Math.random()*times.length)];
+    var phone='0'+Math.floor(Math.random()*9+1)+'***'+Math.floor(Math.random()*90+10);
+    var div=document.createElement('div');
+    div.className='activity-toast';
+    div.innerHTML='🛒 <span class="act-name">'+phone+' ('+n+')</span> đã mua gói <b>'+p+'</b><div class="act-time">'+t+'</div>';
+    ticker.appendChild(div);
+    setTimeout(function(){div.style.animation='slideOut .4s ease forwards';setTimeout(function(){div.remove();},400);},4000);
+  }
+  setTimeout(function(){showActivity();setInterval(showActivity,15000);},8000);
+})();
+/* Floating stars background */
+(function(){
+  var c=document.createElement('canvas');
+  c.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.3';
+  document.body.prepend(c);
+  var ctx=c.getContext('2d');
+  var stars=[];
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<60;i++){
+    stars.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5+.5,dx:Math.random()*.3-.15,dy:Math.random()*.2+.05,o:Math.random()*.5+.3});
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(function(s){
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,188,212,'+s.o+')';ctx.fill();
+      s.x+=s.dx;s.y+=s.dy;
+      if(s.y>c.height){s.y=0;s.x=Math.random()*c.width;}
+      if(s.x<0||s.x>c.width)s.dx*=-1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
 </script>
 </body>
 </html>

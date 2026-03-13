@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"><title>QSP Admin</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QSP Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a1a;color:#fff;font-family:'Segoe UI',sans-serif;padding:20px}
+body{background:#0a0a1a;color:#fff;font-family:'Inter','Segoe UI',sans-serif;padding:20px}
 h1{color:#00e676;text-align:center;margin-bottom:20px;font-size:22px}
 .tabs{display:flex;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .tab{padding:10px 20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;font:bold 13px sans-serif;color:#888;transition:.3s}
@@ -43,6 +44,7 @@ td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:#ccc}
 <h1>⚙️ QSP Admin</h1>
 <div class="tabs">
   <div class="tab active" onclick="showPage('deposits')">💰 Nạp Tiền</div>
+  <div class="tab" onclick="showPage('resets')">🔑 Đổi MK</div>
   <div class="tab" onclick="showPage('users')">👥 Users</div>
   <div class="tab" onclick="showPage('keys')">🔑 Keys</div>
   <div class="tab" onclick="showPage('purchases')">📦 Giao Dịch</div>
@@ -80,6 +82,14 @@ td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:#ccc}
     <div id="purchaseList"></div>
   </div>
 </div>
+
+<!-- PASSWORD RESETS -->
+<div class="page" id="page-resets">
+  <div class="panel">
+    <h2>🔑 Yêu Cầu Đổi Mật Khẩu</h2>
+    <div id="resetList"></div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -114,7 +124,7 @@ async function saveBin(){
 }
 
 async function loadData(){
-  try{await getBin();renderDeposits();renderUsers();renderKeys();renderPurchases();}catch(e){alert('Lỗi: '+e.message);}
+  try{await getBin();renderDeposits();renderUsers();renderKeys();renderPurchases();renderResets();}catch(e){alert('Lỗi: '+e.message);}
 }
 
 function renderDeposits(){
@@ -227,6 +237,35 @@ function renderPurchases(){
   });
   html+='</table>';
   document.getElementById('purchaseList').innerHTML=html;
+}
+
+function renderResets(){
+  var resets=DATA._pw_resets||[];
+  if(resets.length===0){document.getElementById('resetList').innerHTML='<p style="color:#888">Không có yêu cầu đổi MK</p>';return;}
+  var html='<table><tr><th>SĐT</th><th>MK Mới</th><th>Thời gian</th><th>Status</th><th></th></tr>';
+  resets.slice().reverse().forEach(function(r,ri){
+    var i=resets.length-1-ri;
+    var st=r.status==='pending'?'<span class="pending">⏳ Chờ</span>':'<span class="valid">✅ Đã đổi</span>';
+    html+='<tr><td><b>'+r.phone+'</b></td><td style="font-family:monospace;color:#00bcd4">'+r.newPass+'</td>';
+    html+='<td style="font-size:11px">'+new Date(r.created||0).toLocaleString('vi')+'</td>';
+    html+='<td>'+st+'</td>';
+    if(r.status==='pending'){
+      html+='<td><button onclick="approveReset('+i+')" style="padding:6px 12px;font-size:11px">✅ Duyệt</button></td>';
+    }else{html+='<td></td>';}
+    html+='</tr>';
+  });
+  html+='</table>';
+  document.getElementById('resetList').innerHTML=html;
+}
+
+async function approveReset(idx){
+  var r=DATA._pw_resets[idx];
+  if(!r||r.status!=='pending')return;
+  if(!DATA._users||!DATA._users[r.phone]){alert('User không tồn tại!');return;}
+  DATA._users[r.phone].password=r.newPass;
+  r.status='approved';r.approvedAt=Date.now();
+  await saveBin();loadData();
+  alert('✅ Đã đổi MK cho '+r.phone);
 }
 </script>
 </body>
