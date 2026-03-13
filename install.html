@@ -46,7 +46,7 @@ h1{background:linear-gradient(135deg,#00e676,#00bcd4);-webkit-background-clip:te
     <div class="tag tag-free">MIỄN PHÍ</div>
     <div class="mode-name">DÒ ĐÁP ÁN</div>
     <div class="desc">Mở <b>Firefox Ẩn Danh</b><br>Tool tự quét & lưu đáp án lên cloud</div>
-    <a class="bm bm-harvest" id="bmHarvest" onclick="event.preventDefault(); alert('❌ Lỗi: Bạn vừa BẤM vào nút.\\n\\nVui lòng KÉO nút này THẢ VÀO thanh Dấu Trang (Bookmark)!\\n\\n(Trên điện thoại: Đè giữ nút -> Copy địa chỉ liên kết)'); return false;">💀 DÒ</a>
+    <a class="bm bm-harvest" id="bmHarvest">💀 DÒ</a>
   </div>
 
   <!-- HIGHLIGHT -->
@@ -55,7 +55,7 @@ h1{background:linear-gradient(135deg,#00e676,#00bcd4);-webkit-background-clip:te
     <div class="tag tag-key">CẦN KEY</div>
     <div class="mode-name">CHỈ XEM</div>
     <div class="desc">Highlight đáp án đúng<br>Delay 6-10s ngẫu nhiên<br><b>Không auto click</b></div>
-    <a class="bm bm-highlight" id="bmHighlight" onclick="event.preventDefault(); alert('❌ Lỗi: Bạn vừa BẤM vào nút.\\n\\nVui lòng KÉO nút này THẢ VÀO thanh Dấu Trang (Bookmark)!\\n\\n(Trên điện thoại: Đè giữ nút -> Copy địa chỉ liên kết)'); return false;">🔍 CHỈ XEM</a>
+    <a class="bm bm-highlight" id="bmHighlight">🔍 CHỈ XEM</a>
   </div>
 
   <!-- AUTO -->
@@ -64,7 +64,7 @@ h1{background:linear-gradient(135deg,#00e676,#00bcd4);-webkit-background-clip:te
     <div class="tag tag-key">CẦN KEY</div>
     <div class="mode-name">FULL AUTO</div>
     <div class="desc">Highlight + Auto click<br>Delay 6-10s ngẫu nhiên<br><b>Tự động hoàn toàn</b></div>
-    <a class="bm bm-auto" id="bmAuto" onclick="event.preventDefault(); alert('❌ Lỗi: Bạn vừa BẤM vào nút.\\n\\nVui lòng KÉO nút này THẢ VÀO thanh Dấu Trang (Bookmark)!\\n\\n(Trên điện thoại: Đè giữ nút -> Copy địa chỉ liên kết)'); return false;">🎯 AUTO</a>
+    <a class="bm bm-auto" id="bmAuto">🎯 AUTO</a>
   </div>
 </div>
 
@@ -72,8 +72,7 @@ h1{background:linear-gradient(135deg,#00e676,#00bcd4);-webkit-background-clip:te
 
 <div class="steps">
   <div class="step"><b>Bước 1:</b> Mở trang này trên trình duyệt <span class="orange">(Khuyên dùng Firefox)</span></div>
-  <div class="step"><b>Bước 2 (Máy Tính):</b> <span class="orange">Kéo nút</span> bên trên thả vào <b>thanh Dấu Trang (Bookmark)</b> (Ctrl+Shift+B để hiện)</div>
-  <div class="step"><b>Bước 2 (Điện Thoại):</b> Copy đoạn code dài ngoằng của nút → Tạo 1 Bookmark mới → Paste code vào ô Địa chỉ (URL)</div>
+  <div class="step"><b>Bước 2:</b> <b><u>Máy Tính:</u></b> <span class="orange">Kéo thả nút trên</span> vào <b>thanh Bookmark</b> (Ctrl+Shift+B).<br><b><u>Điện Thoại:</u></b> Nhấn (Bấm) thẳng vào nút để <b>Copy code</b> → Tạo 1 Bookmark mới → Dán (Paste) code đó vào ô <b>Địa chỉ (URL)</b>.</div>
   <div class="step"><b>Bước 3 <span class="red">(DÒ):</span></b> Mở <b>Tab Ẩn Danh</b> (Ctrl+Shift+P) → mở quiz → click bookmark <span class="red">💀 DÒ</span> → chờ đáp án tự lưu</div>
   <div class="step"><b>Bước 4 <span class="cyan">(CHƠI):</span></b> Firefox → mở quiz → click bookmark <span class="cyan">🔍 CHỈ XEM</span> hoặc <span style="color:#00e676">🎯 AUTO</span></div>
 </div>
@@ -204,10 +203,43 @@ var hCode = `javascript:(function(){
   }
   setInterval(tick,1500);
 })();`.replace(/\n\s+/g, '');
+  return hCode;
+}
 
-document.getElementById('bmHarvest').href = hCode;
+document.getElementById('bmHarvest').href = getBMHarvest();
 document.getElementById('bmHighlight').href = getBM('highlight');
 document.getElementById('bmAuto').href = getBM('auto');
+
+function handleBtnClick(e) {
+  e.preventDefault();
+  var codeToCopy = this.getAttribute('href');
+  
+  if(navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(codeToCopy).then(() => {
+      alert("✅ ĐÃ COPY CODE THÀNH CÔNG!\n\nLỗi: Bạn vừa BẤM vào nút.\nCách cài (Máy Tính): Cầm nút và KÉO thả vào thanh Bookmark bên trên.\n\nNhưng chúng tôi ĐÃ COPY đoạn code sẵn cho bạn! (Dành cho điện thoại)\nBạn hãy vào Bookmark/Dấu Trang cùa trình duyệt, tạo 1 cái mới, dán đoạn code vừa copy vào ô URL là xong!");
+    });
+  } else {
+    // Fallback for tricky environments
+    var textArea = document.createElement("textarea");
+    textArea.value = codeToCopy;
+    textArea.style.position = "fixed";  // Avoid scrolling to bottom
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      alert("✅ ĐÃ COPY CODE THÀNH CÔNG!\n\nLỗi: Bạn vừa BẤM vào nút.\nCách cài (Máy Tính): Cầm nút và KÉO thả vào thanh Bookmark bên trên.\n\nNhưng chúng tôi ĐÃ COPY đoạn code sẵn cho bạn! (Dành cho điện thoại)\nBạn hãy vào Bookmark/Dấu Trang cùa trình duyệt, tạo 1 cái mới, dán đoạn code vừa copy vào ô URL là xong!");
+    } catch (err) {
+      alert("❌ Lỗi: Bạn vừa BẤM vào nút.\n\n- MÁY TÍNH: Vui lòng KÉO nút này THẢ VÀO thanh Dấu Trang (Bookmark)!\n- ĐIỆN THOẠI: Đè giữ nút -> Copy địa chỉ liên kết (URL)");
+    }
+    document.body.removeChild(textArea);
+  }
+}
+
+document.getElementById('bmHarvest').addEventListener('click', handleBtnClick);
+document.getElementById('bmHighlight').addEventListener('click', handleBtnClick);
+document.getElementById('bmAuto').addEventListener('click', handleBtnClick);
+
 </script>
 </body>
 </html>
