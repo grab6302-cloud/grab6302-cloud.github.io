@@ -72,7 +72,7 @@ h1{background:linear-gradient(135deg,#00e676,#00bcd4);-webkit-background-clip:te
 
 <div class="steps">
   <div class="step"><b>Bước 1:</b> Mở trang này trên trình duyệt <span class="orange">(Khuyên dùng Firefox)</span></div>
-  <div class="step"><b>Bước 2:</b> <b><u>Máy Tính:</u></b> <span class="orange">Kéo thả nút trên</span> vào <b>thanh Bookmark</b> (Ctrl+Shift+B).<br><b><u>Điện Thoại:</u></b> Nhấn (Bấm) thẳng vào nút để <b>Copy code</b> → Tạo 1 Bookmark mới → Dán (Paste) code đó vào ô <b>Địa chỉ (URL)</b>.</div>
+  <div class="step"><b>Bước 2 (Máy Tính):</b> <span class="orange">Kéo thả nút trên</span> vào <b>thanh Bookmark</b> (Ctrl+Shift+B).<br><b>Bước 2 (Điện Thoại):</b> Nhấn thẳng vào nút để <b>Copy code</b> → Mở Chrome/Safari chọn <b>Thêm Dấu Trang mới</b> → Dán code vào ô <b>"Địa chỉ" (URL)</b>.</div>
   <div class="step"><b>Bước 3 <span class="red">(DÒ):</span></b> Mở <b>Tab Ẩn Danh</b> (Ctrl+Shift+P) → mở quiz → click bookmark <span class="red">💀 DÒ</span> → chờ đáp án tự lưu</div>
   <div class="step"><b>Bước 4 <span class="cyan">(CHƠI):</span></b> Firefox → mở quiz → click bookmark <span class="cyan">🔍 CHỈ XEM</span> hoặc <span style="color:#00e676">🎯 AUTO</span></div>
 </div>
@@ -104,20 +104,37 @@ function getBM(mode) {
 
     fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}}).then(r=>r.json()).then(j=>{
       var d=j.record||j; var keys=d._keys||{}; var ans=d._answers||{};
+      var kInfo=keys[k];
       
-      var valid=false;
-      if(keys[k] && keys[k].active && (!keys[k].expires || Date.now()<=keys[k].expires)){
-        valid=true; localStorage.setItem('qsp_key',k);
-        
-        /* Chống vượt rào: Nếu tải mode AUTO nhưng xài key gói Chỉ Xem */
-        if(MODE==='auto' && keys[k].plan && keys[k].plan.toLowerCase().indexOf('chỉ xem')>-1){
-          MODE='highlight'; log('⚠️ Gói của bạn chỉ chạy Highlight!','#ff9800');
-        } else {
-          log('✅ '+(MODE==='auto'?'🎯 AUTO':'🔍 CHỈ XEM')+' | Key OK','#00e676');
-        }
+      if(!kInfo || !kInfo.active) { log('❌ Key sai/bị khóa!','#f44'); localStorage.removeItem('qsp_key'); return; }
+      if(kInfo.expires && Date.now() > kInfo.expires) { log('❌ Key VIP đã hết hạn!','#f44'); localStorage.removeItem('qsp_key'); return; }
+      
+      // 1. Check Device Lock
+      var did=localStorage.getItem('qsp_did');
+      if(!did){did=Date.now().toString(36)+Math.random().toString(36).substr(2); localStorage.setItem('qsp_did',did);}
+      
+      var needsSync=false;
+      if(!kInfo.did){ kInfo.did=did; needsSync=true; }
+      else if(kInfo.did!==did){ log('❌ Key đăng nhập ở máy khác!','#f44'); return; }
+      
+      // 2. Check Quizzes used
+      var qUrl=location.host+location.pathname;
+      if(!kInfo.quizzes) kInfo.quizzes=[];
+      if(kInfo.quizzes.indexOf(qUrl)===-1){
+         if(kInfo.uses<999 && kInfo.quizzes.length>=kInfo.uses){
+             log('❌ Key đã hết lượt bài! Vui lòng gia hạn.','#ff9800'); return;
+         }
+         kInfo.quizzes.push(qUrl);
+         needsSync=true;
       }
       
-      if(!valid){ log('❌ Key không hợp lệ!','#f44'); localStorage.removeItem('qsp_key'); return; }
+      var proceed=function(){
+        localStorage.setItem('qsp_key',k);
+        if(MODE==='auto' && kInfo.plan && kInfo.plan.toLowerCase().indexOf('chỉ xem')>-1){
+          MODE='highlight'; log('⚠️ Gói của bạn chỉ chạy Highlight!','#ff9800');
+        } else {
+          log('✅ '+(MODE==='auto'?'🎯 AUTO':'🔍 CHỈ XEM')+' 100%','#00e676');
+        }
 
       var _lq='';
       function tick(){
@@ -162,7 +179,16 @@ function getBM(mode) {
           } else { log('❓ Chưa có đáp án','#ff5722'); }
         } catch(e){}
       }
-      setInterval(tick,1500);
+      
+      // Khởi động
+      if(needsSync){
+        log('⏳ Đang lưu dữ liệu Cloud...','#ff9800');
+        fetch('https://api.jsonbin.io/v3/b/'+B_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':B_KEY},body:JSON.stringify(d)})
+        .then(function(r){ proceed(); setInterval(tick,1500); })
+        .catch(function(e){ log('❌ Lỗi lưu Cloud!','#f44'); });
+      } else { 
+        proceed(); setInterval(tick,1500); 
+      }
     }).catch(e=>log('❌ Lỗi kết nối server!','#f44'));
   })();`;
   
@@ -216,7 +242,7 @@ function handleBtnClick(e) {
   
   if(navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(codeToCopy).then(() => {
-      alert("✅ ĐÃ COPY CODE THÀNH CÔNG!\n\nLỗi: Bạn vừa BẤM vào nút.\nCách cài (Máy Tính): Cầm nút và KÉO thả vào thanh Bookmark bên trên.\n\nNhưng chúng tôi ĐÃ COPY đoạn code sẵn cho bạn! (Dành cho điện thoại)\nBạn hãy vào Bookmark/Dấu Trang cùa trình duyệt, tạo 1 cái mới, dán đoạn code vừa copy vào ô URL là xong!");
+      alert("✅ ĐÃ COPY CODE THÀNH CÔNG!\n\nBạn là Điện Thoại đúng không?\n- Mở Menu trình duyệt -> Chọn 'Thêm Dấu Trang'\n- Nhấn nút Sửa Dấu Trang đó.\n- Dán đoạn code vừa copy vào ô URL (địa chỉ) rồi lưu lại là xong!");
     });
   } else {
     // Fallback for tricky environments
@@ -228,9 +254,9 @@ function handleBtnClick(e) {
     textArea.select();
     try {
       document.execCommand('copy');
-      alert("✅ ĐÃ COPY CODE THÀNH CÔNG!\n\nLỗi: Bạn vừa BẤM vào nút.\nCách cài (Máy Tính): Cầm nút và KÉO thả vào thanh Bookmark bên trên.\n\nNhưng chúng tôi ĐÃ COPY đoạn code sẵn cho bạn! (Dành cho điện thoại)\nBạn hãy vào Bookmark/Dấu Trang cùa trình duyệt, tạo 1 cái mới, dán đoạn code vừa copy vào ô URL là xong!");
+      alert("✅ ĐÃ COPY CODE THÀNH CÔNG!\n\nBạn là Điện Thoại đúng không?\n- Mở Menu trình duyệt -> Chọn 'Thêm Dấu Trang'\n- Nhấn nút Sửa Dấu Trang đó.\n- Dán đoạn code vừa copy vào ô URL (địa chỉ) rồi lưu lại là xong!");
     } catch (err) {
-      alert("❌ Lỗi: Bạn vừa BẤM vào nút.\n\n- MÁY TÍNH: Vui lòng KÉO nút này THẢ VÀO thanh Dấu Trang (Bookmark)!\n- ĐIỆN THOẠI: Đè giữ nút -> Copy địa chỉ liên kết (URL)");
+      alert("❌ COPY LỖI!\n\nVui lòng tự đè giữ nút để Copy địa chỉ liên kết nhé.");
     }
     document.body.removeChild(textArea);
   }

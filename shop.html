@@ -317,7 +317,21 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
     
     <div class="confirm-actions">
       <button class="btn-cancel" onclick="closeConfirmModal()">Hủy</button>
-      <button class="btn-confirm" onclick="executeBuy()">MUA NGAY</button>
+      <button class="btn-confirm" onclick="executeBuy()">THANH TOÁN</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENEW MODAL -->
+<div class="confirm-modal" id="renewModal" onclick="if(event.target===this)closeRenewModal()">
+  <div class="confirm-panel">
+    <button class="keys-close" onclick="closeRenewModal()">✕</button>
+    <h2>Gia Hạn Key</h2>
+    <div class="confirm-desc">Gia hạn cho Key: <b id="rkName" style="color:var(--cyan)"></b></div>
+    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:10px;">
+       <button class="buy-btn" style="background:linear-gradient(135deg,var(--green),var(--cyan)); color:#000; padding:12px; border:none; border-radius:10px; font-weight:bold; cursor:pointer;" onclick="execRenew(1, 10000, '1 bài (auto)')">1 Bài Auto (+10K)</button>
+       <button class="buy-btn" style="background:linear-gradient(135deg,var(--green),var(--cyan)); color:#000; padding:12px; border:none; border-radius:10px; font-weight:bold; cursor:pointer;" onclick="execRenew(5, 39000, '5 bài')">5 Bài (+39K)</button>
+       <button class="buy-btn" style="background:linear-gradient(135deg,var(--green),var(--cyan)); color:#000; padding:12px; border:none; border-radius:10px; font-weight:bold; cursor:pointer;" onclick="execRenew(999, 149000, 'VIP tuần')">VIP Tuần (+149K)</button>
     </div>
   </div>
 </div>
@@ -385,8 +399,9 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
     <div id="authLogin">
       <h2>👋 Đăng nhập</h2>
       <p class="sub">Đăng nhập để mua gói & nhận key</p>
+      <div id="lError" style="color:#ff5252; text-align:center; font-weight:bold; margin-bottom:12px"></div>
       <div class="form-group"><label>📱 Số điện thoại</label><input type="tel" id="lPhone" placeholder="09xxxxxxxx" maxlength="11"></div>
-      <div class="form-group"><label>🔒 Mật khẩu</label><div class="pw-toggle"><input type="password" id="lPass" placeholder="••••••"><button class="eye" onclick="togglePw('lPass')">👁️</button></div></div>
+      <div class="form-group"><label>🔒 Mật khẩu</label><div class="pw-toggle"><input type="password" id="lPass" placeholder="••••••" onkeyup="if(event.key==='Enter')doLogin()"><button class="eye" onclick="togglePw('lPass')">👁️</button></div></div>
       <button class="submit-btn" onclick="doLogin()">Đăng nhập</button>
       <button class="link-btn" onclick="showForgot()">Quên mật khẩu?</button>
       <div class="divider"><span>hoặc</span></div>
@@ -419,6 +434,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
     <div id="authForgot" style="display:none">
       <h2>🔑 Quên mật khẩu</h2>
       <p class="sub">Nhập SĐT đã đăng ký để đặt lại mật khẩu</p>
+      <div id="fError" style="color:#ff5252; text-align:center; font-weight:bold; margin-bottom:12px"></div>
       <div class="form-group"><label>📱 Số điện thoại</label><input type="tel" id="fPhone" placeholder="09xxxxxxxx" maxlength="11"></div>
       <div class="form-group"><label>🔒 Mật khẩu mới</label><div class="pw-toggle"><input type="password" id="fNewPass" placeholder="Mật khẩu mới"><button class="eye" onclick="togglePw('fNewPass')">👁️</button></div></div>
       <button class="submit-btn" onclick="doResetPw()">Gửi yêu cầu đổi MK</button>
@@ -465,7 +481,7 @@ window.addEventListener('scroll',function(){
 /* Escape key closes modals */
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
-    closeAuth();closeDeposit();closeKeysModal();
+    closeAuth();closeDeposit();closeKeysModal();closeRenewModal();
   }
 });
 
@@ -585,37 +601,39 @@ async function doRegister(){
 
 /* Login */
 async function doLogin(){
+  var eMsg = document.getElementById('lError'); eMsg.textContent = '';
   var phone=document.getElementById('lPhone').value.trim();
   var pass=document.getElementById('lPass').value;
-  if(!phone||phone.length<9){alert('Nhập SĐT!');return;}
-  if(!pass){alert('Nhập mật khẩu!');return;}
+  if(!phone||phone.length<9){eMsg.textContent='❌ Vui lòng nhập SĐT hợp lệ!';return;}
+  if(!pass){eMsg.textContent='❌ Vui lòng nhập mật khẩu!';return;}
   try{
     var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
     var j=await r.json();var d=j.record||{};
     var users=d._users||{};
-    if(!users[phone]){alert('SĐT chưa đăng ký!');return;}
-    if(users[phone].password!==pass){alert('❌ Sai mật khẩu!');return;}
+    if(!users[phone]){eMsg.textContent='❌ SĐT chưa được đăng ký!';return;}
+    if(users[phone].password!==pass){eMsg.textContent='❌ Sai mật khẩu! Vui lòng thử lại!';return;}
     _phone=phone;localStorage.setItem('qh_phone',phone);
     closeAuth();enterApp(d);
-  }catch(e){alert('Lỗi: '+e.message);}
+  }catch(e){eMsg.textContent='❌ Lỗi kết nối: '+e.message;}
 }
 
 /* Forgot PW */
 async function doResetPw(){
+  var eMsg = document.getElementById('fError'); eMsg.textContent = '';
   var phone=document.getElementById('fPhone').value.trim();
   var newPass=document.getElementById('fNewPass').value;
-  if(!phone||phone.length<9){alert('Nhập SĐT!');return;}
-  if(!newPass||newPass.length<4){alert('MK mới tối thiểu 4 ký tự!');return;}
+  if(!phone||phone.length<9){eMsg.textContent='❌ Vui lòng nhập SĐT!';return;}
+  if(!newPass||newPass.length<4){eMsg.textContent='❌ MK mới tối thiểu 4 ký tự!';return;}
   try{
     var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
     var j=await r.json();var d=j.record||{};
-    if(!d._users||!d._users[phone]){alert('SĐT chưa đăng ký!');return;}
+    if(!d._users||!d._users[phone]){eMsg.textContent='❌ SĐT chưa đăng ký!';return;}
     if(!d._pw_resets) d._pw_resets=[];
     d._pw_resets.push({phone:phone,newPass:newPass,status:'pending',created:Date.now()});
     await fetch('https://api.jsonbin.io/v3/b/'+_a,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':_b},body:JSON.stringify(d)});
     alert('✅ Đã gửi yêu cầu đổi MK!\nAdmin sẽ xác nhận trong 5 phút.');
     showLogin();
-  }catch(e){alert('Lỗi: '+e.message);}
+  }catch(e){eMsg.textContent='❌ Lỗi kết nối: '+e.message;}
 }
 
 function enterApp(data){
@@ -742,19 +760,28 @@ async function showKeys(){
     var j=await r.json();var d=j.record||{};var keys=d._keys||{};
     var my=Object.keys(keys).filter(function(k){return keys[k].phone===_phone;});
     if(my.length===0){document.getElementById('keysTableBody').innerHTML='<p style="color:#888;text-align:center">Chưa có key. Mua gói để nhận!</p>';return;}
-    var html='<table class="keys-table"><thead><tr><th>Key</th><th>Gói</th><th>Giá</th><th>Thời gian</th><th></th></tr></thead><tbody>';
+    var html='<table class="keys-table" style="width:100%"><thead><tr><th>Key</th><th>Gói / Lượt</th><th>Trạng Thái</th><th>Hành Động</th></tr></thead><tbody>';
     my.reverse().forEach(function(k){
       var v=keys[k];
       var dt=new Date(v.created);
       var timeStr=dt.toLocaleDateString('vi')+' '+dt.toLocaleTimeString('vi',{hour:'2-digit',minute:'2-digit'});
-      var price=_planPrices[v.plan]||'—';
+      var isExp = false;
+      if(v.expires && Date.now() > v.expires) isExp = true;
+      if(v.uses < 999 && v.quizzes && v.quizzes.length >= v.uses) isExp = true;
+      var status = isExp ? '<span style="color:#f44">Hết hạn</span>' : '<span style="color:#00e676">Đang chạy</span>';
+      if(!v.active) status = '<span style="color:#aaa">Bị Khóa</span>';
+      var usesTxt = v.uses >= 999 ? 'VIP' : ((v.quizzes ? v.quizzes.length : 0) + '/' + v.uses + ' bài');
+
       html+='<tr>';
-      html+='<td class="key-mono" onclick="navigator.clipboard.writeText(\''+k+'\');showToast(\'📋 Đã copy key!\')">'+k+'</td>';
-      html+='<td>📦 '+v.plan+'</td>';
-      html+='<td class="price-col">'+price+'</td>';
-      html+='<td>'+timeStr+'</td>';
-      html+='<td><button class="keys-copy" onclick="navigator.clipboard.writeText(\''+k+'\');showToast(\'📋 Đã copy key!\')">Copy</button></td>';
-      html+='</tr>';
+      html+='<td class="key-mono" style="font-size:13px" onclick="navigator.clipboard.writeText(\\''+k+'\\');showToast(\\'📋 Đã copy key!\\')">'+k+'<br><span style="color:#777;font-size:11px">'+timeStr+'</span></td>';
+      html+='<td><span style="color:#ccc;font-weight:bold;text-transform:capitalize">'+v.plan+'</span><br><span style="color:#888;font-size:12px">'+usesTxt+'</span></td>';
+      html+='<td style="font-size:13px">'+status+'</td>';
+      html+='<td style="display:flex;gap:6px;">';
+      html+='<button class="keys-copy" onclick="navigator.clipboard.writeText(\\''+k+'\\');showToast(\\'📋 Đã copy key!\\')">Copy</button>';
+      if(isExp && v.active) {
+          html+='<button style="background:var(--cyan); color:#000; padding:4px 8px; border:none; border-radius:6px; cursor:pointer; font-weight:bold" onclick="openRenewModal(\\''+k+'\\')">Gia Hạn</button>';
+      }
+      html+='</td></tr>';
     });
     html+='</tbody></table>';
     document.getElementById('keysTableBody').innerHTML=html;
