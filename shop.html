@@ -12,8 +12,8 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 
 /* ANIMATED BORDER */
 @keyframes borderSpin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
-.glow-hover{position:relative;z-index:0}
-.glow-hover::before{content:'';position:absolute;top:50%;left:50%;width:150%;height:150%;background:conic-gradient(transparent 0deg,transparent 260deg,var(--green) 280deg,var(--cyan) 310deg,var(--purple) 340deg,transparent 360deg);z-index:-2;border-radius:inherit;animation:borderSpin 2.5s linear infinite;transform-origin:center center}
+.glow-hover{position:relative;z-index:0;overflow:hidden}
+.glow-hover::before{content:'';position:absolute;top:50%;left:50%;width:200%;height:200%;background:conic-gradient(transparent 0deg,transparent 270deg,var(--green) 290deg,var(--cyan) 320deg,var(--purple) 350deg,transparent 360deg);z-index:-2;animation:borderSpin 2.5s linear infinite}
 .glow-hover::after{content:'';position:absolute;inset:2px;background:#0b0b1e;border-radius:inherit;z-index:-1}
 
 /* TOP BAR */
