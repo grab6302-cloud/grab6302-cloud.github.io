@@ -94,7 +94,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .plan-list{list-style:none;text-align:left;font-size:14px;color:#ccc;flex:1}
 .plan-list li{padding:6px 0;padding-left:22px;position:relative}
 .plan-list li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700}
-.plan .buy-btn{display:block;margin-top:auto;padding:14px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font:bold 15px 'Inter',sans-serif;border:none;border-radius:12px;cursor:pointer;width:100%;transition:.3s;position:relative;overflow:hidden}
+.plan .buy-btn{display:block;margin-top:auto;width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font:bold 15px 'Inter',sans-serif;border:none;border-radius:12px;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
 .plan .buy-btn:hover{transform:scale(1.03) translateY(-2px);box-shadow:0 6px 20px rgba(0,230,118,.25)}
 .plan .buy-btn:active{transform:scale(.97)}
 
@@ -296,7 +296,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
   <div class="plans">
     <div class="plan glow-hover" onclick="buyPlan(1,6000,'1 bài (chỉ xem)')"><div class="plan-name">1 Bài (Chỉ Xem)</div><div class="plan-price">6K <span>VNĐ</span></div><div class="plan-dur">1 lượt highlight</div><ul class="plan-list"><li>🔍 Highlight đáp án</li></ul><button class="buy-btn">MUA NGAY</button></div>
     <div class="plan glow-hover" onclick="buyPlan(1,10000,'1 bài (auto)')"><div class="plan-name">1 Bài (Auto)</div><div class="plan-price">10K <span>VNĐ</span></div><div class="plan-dur">1 lượt trả lời</div><ul class="plan-list"><li>🔍 Highlight đáp án</li><li>🎯 Auto trả lời</li></ul><button class="buy-btn">MUA NGAY</button></div>
-    <div class="popular-wrap"><div class="popular-badge">⭐ PHỔ BIẾN NHẤT</div><div class="plan glow-hover popular" onclick="buyPlan(5,39000,'5 bài')" style="width:100%"><div class="plan-name">5 Bài</div><div class="plan-price">39K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 11K</div><ul class="plan-list"><li>🔍 Highlight đáp án</li><li>🎯 Auto trả lời</li><li>💰 Tiết kiệm 22%</li></ul><button class="buy-btn">MUA NGAY</button></div></div>
+    <div class="popular-wrap" style="display:flex;flex-direction:column"><div class="popular-badge">⭐ PHỔ BIẾN NHẤT</div><div class="plan glow-hover popular" onclick="buyPlan(5,39000,'5 bài')" style="width:100%;flex:1"><div class="plan-name">5 Bài</div><div class="plan-price">39K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 11K</div><ul class="plan-list"><li>🔍 Highlight đáp án</li><li>🎯 Auto trả lời</li><li>💰 Tiết kiệm 22%</li></ul><button class="buy-btn">MUA NGAY</button></div></div>
     <div class="plan glow-hover" onclick="buyPlan(999,149000,'VIP tuần')"><div class="plan-name">VIP Tuần</div><div class="plan-price">149K <span>VNĐ</span></div><div class="plan-dur">Không giới hạn 7 ngày</div><ul class="plan-list"><li>🔍 Highlight đáp án</li><li>🎯 Auto trả lời</li><li>♾️ Không giới hạn</li><li>⚡ Ưu tiên hỗ trợ</li></ul><button class="buy-btn">MUA NGAY</button></div>
   </div>
 </section>
@@ -316,18 +316,9 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
     <button class="keys-close" onclick="closeConfirmModal()">✕</button>
     <h2>Xác Nhận Mua Gói</h2>
     <div class="confirm-desc" id="confirmBuyDesc">Bạn đang mua gói <b>...</b> giá <b>...</b></div>
-    
-    <label class="confirm-check">
-      <input type="checkbox" id="checkLaptop">
-      <span>
-        <span class="lbl-title">Bạn xài trình duyệt máy tính (Laptop/PC)?</span>
-        <span class="lbl-sub">Tích vào để nhận kèm công cụ Dò giúp Server thu thập đáp án, đảm bảo Tool Auto hoạt động mượt mà.</span>
-      </span>
-    </label>
-    
     <div class="confirm-actions">
       <button class="btn-cancel" onclick="closeConfirmModal()">Hủy</button>
-      <button class="btn-confirm" onclick="executeBuy()">MUA NGAY</button>
+      <button class="btn-confirm" onclick="executeBuy()">THANH TOÁN</button>
     </div>
   </div>
 </div>
@@ -339,10 +330,9 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
     <div class="step glow-hover"><div class="step-num">1</div><b>Đăng ký</b><p>Tạo tài khoản tại trang này</p></div>
     <div class="step glow-hover"><div class="step-num">2</div><b>Nạp tiền</b><p>Quét QR chuyển khoản</p></div>
     <div class="step glow-hover"><div class="step-num">3</div><b>Mua gói</b><p>Chọn gói phù hợp & nhận key</p></div>
-    <div class="step glow-hover"><div class="step-num">4</div><b>Cài Bookmark</b><p>Vào trang <a href="install.html" style="color:var(--cyan)" target="_blank">Cài đặt</a> → kéo nút vào thanh bookmark</p></div>
-    <div class="step glow-hover"><div class="step-num">5</div><b>Cài Node.js (Cho DÒ)</b><p>Tải Node.js và chạy <code style="color:var(--green)">node proxy.js</code>. <a href="setup.html" style="color:var(--cyan)" target="_blank">Xem HD</a></p></div>
-    <div class="step glow-hover"><div class="step-num">6</div><b>Mở Quiz</b><p>Vào trang làm bài (Wayground/Quizizz) trên trình duyệt</p></div>
-    <div class="step glow-hover"><div class="step-num">6</div><b>Bấm Bookmark</b><p>Click bookmark → nhập key → tool tự động chạy!</p></div>
+    <div class="step glow-hover"><div class="step-num">4</div><b>Cài Bookmark</b><p>Vào trang <a href="install.html" style="color:var(--cyan)" target="_blank">Cài đặt</a> → kéo nút Bookmarklet</p></div>
+    <div class="step glow-hover"><div class="step-num">5</div><b>Mở Quiz</b><p>Vào trang trò chơi trên trình duyệt</p></div>
+    <div class="step glow-hover"><div class="step-num">6</div><b>Sử dụng</b><p>Click bookmark → nhập key → auto chạy!</p></div>
   </div>
 </section>
 
