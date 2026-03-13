@@ -10,6 +10,13 @@
 :root{--bg:#0b0b1e;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--green:#00e676;--cyan:#00bcd4;--purple:#7c4dff}
 body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:hidden}
 
+/* ANIMATED BORDER */
+@keyframes borderSpin{0%{--angle:0deg}100%{--angle:360deg}}
+@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+.glow-hover{position:relative;overflow:hidden}
+.glow-hover::before{content:'';position:absolute;inset:-2px;background:conic-gradient(from var(--angle),transparent 40%,var(--green),var(--cyan),var(--purple),transparent 60%);opacity:0;transition:opacity .4s;z-index:-1;border-radius:inherit;animation:borderSpin 3s linear infinite}
+.glow-hover:hover::before{opacity:1}
+
 /* TOP BAR */
 .topbar{position:fixed;top:0;left:0;right:0;background:rgba(11,11,30,.97);border-bottom:1px solid var(--border);padding:12px 24px;display:none;justify-content:space-between;align-items:center;z-index:500;backdrop-filter:blur(10px)}
 .topbar .user{color:var(--green);font-size:14px;font-weight:600}
@@ -97,7 +104,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .switch-text a{color:var(--green);cursor:pointer;text-decoration:none;font-weight:600}
 .pw-toggle{position:relative}
 .pw-toggle input{padding-right:50px}
-.pw-toggle .eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:#999;font-size:20px;cursor:pointer}
+.pw-toggle .eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:#999;font-size:20px;cursor:pointer;user-select:none}
 
 .how{padding:70px 20px;text-align:center}
 .steps{display:flex;gap:14px;justify-content:center;flex-wrap:nowrap;max-width:850px;margin:30px auto 0}
@@ -135,10 +142,10 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
   <div class="logo">📚 Quiz Helper</div>
   <p class="tagline">Công cụ hỗ trợ học tập — Nhanh, chính xác, tiện lợi!</p>
   <div class="features">
-    <div class="feat"><div class="feat-icon">⚡</div><h3>Nhanh Chóng</h3><p>Hỗ trợ tức thì</p></div>
-    <div class="feat"><div class="feat-icon">🎯</div><h3>Chính Xác</h3><p>Đáp án chuẩn</p></div>
-    <div class="feat"><div class="feat-icon">🛡️</div><h3>Bảo Mật</h3><p>Thông tin an toàn</p></div>
-    <div class="feat"><div class="feat-icon">📱</div><h3>Dễ Dùng</h3><p>Không cần cài đặt</p></div>
+    <div class="feat glow-hover"><div class="feat-icon">⚡</div><h3>Nhanh Chóng</h3><p>Hỗ trợ tức thì</p></div>
+    <div class="feat glow-hover"><div class="feat-icon">🎯</div><h3>Chính Xác</h3><p>Đáp án chuẩn</p></div>
+    <div class="feat glow-hover"><div class="feat-icon">🛡️</div><h3>Bảo Mật</h3><p>Thông tin an toàn</p></div>
+    <div class="feat glow-hover"><div class="feat-icon">📱</div><h3>Dễ Dùng</h3><p>Không cần cài đặt</p></div>
   </div>
 </section>
 
@@ -156,10 +163,10 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
   <div class="section-title">🛒 Chọn Gói</div>
   <p class="section-sub" id="pricingSub">Đăng nhập → Nạp tiền → Mua gói → Nhận key ngay!</p>
   <div class="plans">
-    <div class="plan" onclick="buyPlan(1,6000,'1 bài')"><div class="plan-name">1 Bài</div><div class="plan-price">6K <span>VNĐ</span></div><div class="plan-dur">1 lượt</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li></ul><button class="buy-btn">MUA NGAY</button></div>
-    <div class="plan" onclick="buyPlan(5,25000,'5 bài')"><div class="plan-name">5 Bài</div><div class="plan-price">25K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 5K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 17%</li></ul><button class="buy-btn">MUA NGAY</button></div>
-    <div class="plan" onclick="buyPlan(10,40000,'10 bài')"><div class="plan-name">10 Bài</div><div class="plan-price">40K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 20K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 33%</li></ul><button class="buy-btn">MUA NGAY</button></div>
-    <div class="plan" onclick="buyPlan(999,60000,'VIP tuần')"><div class="plan-name">VIP Tuần</div><div class="plan-price">60K <span>VNĐ</span></div><div class="plan-dur">Không giới hạn 7 ngày</div><ul class="plan-list"><li>Chơi thoải mái</li><li>Không giới hạn</li><li>Ưu tiên hỗ trợ</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan glow-hover" onclick="buyPlan(1,6000,'1 bài')"><div class="plan-name">1 Bài</div><div class="plan-price">6K <span>VNĐ</span></div><div class="plan-dur">1 lượt</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan glow-hover" onclick="buyPlan(5,25000,'5 bài')"><div class="plan-name">5 Bài</div><div class="plan-price">25K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 5K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 17%</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan glow-hover" onclick="buyPlan(10,40000,'10 bài')"><div class="plan-name">10 Bài</div><div class="plan-price">40K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 20K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 33%</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan glow-hover" onclick="buyPlan(999,60000,'VIP tuần')"><div class="plan-name">VIP Tuần</div><div class="plan-price">60K <span>VNĐ</span></div><div class="plan-dur">Không giới hạn 7 ngày</div><ul class="plan-list"><li>Chơi thoải mái</li><li>Không giới hạn</li><li>Ưu tiên hỗ trợ</li></ul><button class="buy-btn">MUA NGAY</button></div>
   </div>
 </section>
 
@@ -172,10 +179,10 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 <section class="how">
   <div class="section-title">📖 Cách Dùng</div>
   <div class="steps">
-    <div class="step"><div class="step-num">1</div><b>Đăng ký</b><p>Tạo tài khoản</p></div>
-    <div class="step"><div class="step-num">2</div><b>Nạp tiền</b><p>Quét QR</p></div>
-    <div class="step"><div class="step-num">3</div><b>Mua gói</b><p>Nhanh gọn dễ xài</p></div>
-    <div class="step"><div class="step-num">4</div><b>Nhận key</b><p>Tự động nhanh chóng</p></div>
+    <div class="step glow-hover"><div class="step-num">1</div><b>Đăng ký</b><p>Tạo tài khoản</p></div>
+    <div class="step glow-hover"><div class="step-num">2</div><b>Nạp tiền</b><p>Quét QR</p></div>
+    <div class="step glow-hover"><div class="step-num">3</div><b>Mua gói</b><p>Nhanh gọn dễ xài</p></div>
+    <div class="step glow-hover"><div class="step-num">4</div><b>Nhận key</b><p>Tự động nhanh chóng</p></div>
   </div>
 </section>
 
@@ -267,7 +274,7 @@ function showRegister(){document.getElementById('authLogin').style.display='none
 function showForgot(){document.getElementById('authLogin').style.display='none';document.getElementById('authRegister').style.display='none';document.getElementById('authForgot').style.display='block';}
 document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)closeAuth();});
 
-function togglePw(id){var i=document.getElementById(id);i.type=i.type==='password'?'text':'password';}
+function togglePw(id){var i=document.getElementById(id);var btn=i.parentElement.querySelector('.eye');if(i.type==='password'){i.type='text';btn.textContent='🙈';}else{i.type='password';btn.textContent='👁️';}}
 
 function socialLogin(provider){alert('🚧 Đăng nhập bằng '+provider+' sắp ra mắt!\n\nHiện tại vui lòng dùng SĐT.');}
 
