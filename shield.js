@@ -1,5 +1,5 @@
 /* ==========================================
-   🛡️ QSP SHIELD v1.0 — Anti-Copy Protection
+   🛡️ QSP SHIELD v2.0 — MAX PROTECTION
    ========================================== */
 (function(){
   // 1. Block right-click
@@ -7,61 +7,83 @@
 
   // 2. Block text selection
   document.addEventListener('selectstart', function(e){ e.preventDefault(); });
-  document.body.style.userSelect = 'none';
-  document.body.style.webkitUserSelect = 'none';
-  document.body.style.msUserSelect = 'none';
+  var s = document.createElement('style');
+  s.textContent = '*{-webkit-user-select:none!important;-moz-user-select:none!important;-ms-user-select:none!important;user-select:none!important} input,textarea{-webkit-user-select:text!important;-moz-user-select:text!important;user-select:text!important}';
+  document.head.appendChild(s);
 
-  // 3. Block keyboard shortcuts (Ctrl+U, Ctrl+S, Ctrl+Shift+I, F12, Ctrl+Shift+J, Ctrl+Shift+C)
+  // 3. Block ALL keyboard shortcuts
   document.addEventListener('keydown', function(e){
-    // F12
     if(e.key === 'F12') { e.preventDefault(); return false; }
-    // Ctrl+Shift+I (DevTools)
-    if(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) { e.preventDefault(); return false; }
-    // Ctrl+Shift+J (Console)
-    if(e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) { e.preventDefault(); return false; }
-    // Ctrl+Shift+C (Inspect)
-    if(e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) { e.preventDefault(); return false; }
-    // Ctrl+U (View Source)
-    if(e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
-    // Ctrl+S (Save)
-    if(e.ctrlKey && (e.key === 'S' || e.key === 's')) { e.preventDefault(); return false; }
-    // Ctrl+A (Select All) - ngoại trừ khi đang ở trong input/textarea
-    if(e.ctrlKey && (e.key === 'A' || e.key === 'a') && !(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
-      e.preventDefault(); return false;
-    }
-    // Ctrl+C (Copy) - ngoại trừ input/textarea
-    if(e.ctrlKey && (e.key === 'C' || e.key === 'c') && !(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
-      e.preventDefault(); return false;
-    }
+    if(e.key === 'F5' && e.ctrlKey) { e.preventDefault(); return false; }
+    if(e.ctrlKey && e.shiftKey && /[IiJjCc]/.test(e.key)) { e.preventDefault(); return false; }
+    if(e.ctrlKey && /[UuSs]/.test(e.key)) { e.preventDefault(); return false; }
+    if(e.ctrlKey && /[Aa]/.test(e.key) && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); return false; }
+    if(e.ctrlKey && /[Cc]/.test(e.key) && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); return false; }
+    if(e.ctrlKey && /[Pp]/.test(e.key)) { e.preventDefault(); return false; } // block print
   });
 
-  // 4. Block drag on images and links  
+  // 4. Block drag
   document.addEventListener('dragstart', function(e){
-    if(e.target.tagName !== 'A' || !e.target.classList.contains('bm')) {
-      e.preventDefault();
-    }
+    if(!e.target.classList || !e.target.classList.contains('bm')) { e.preventDefault(); }
   });
 
-  // 5. DevTools detection (resize trick)
-  var threshold = 160;
-  var devtoolsOpen = false;
+  // 5. Debugger trap — freezes DevTools if opened
+  (function trap(){
+    var t = new Date();
+    debugger;
+    if(new Date() - t > 100) {
+      document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#0a0a1a;color:#f44;font:bold 28px Inter,sans-serif;text-align:center;padding:40px;flex-direction:column;gap:20px"><div style="font-size:60px">⛔</div><div>PHÁT HIỆN DEBUGGER!</div><div style="font-size:16px;color:#888">Vui lòng đóng Developer Tools<br>và tải lại trang.</div></div>';
+      return;
+    }
+    setTimeout(trap, 1000);
+  })();
+
+  // 6. DevTools detection (resize)
+  var _dt = false;
   setInterval(function(){
-    var w = window.outerWidth - window.innerWidth > threshold;
-    var h = window.outerHeight - window.innerHeight > threshold;
+    var w = window.outerWidth - window.innerWidth > 160;
+    var h = window.outerHeight - window.innerHeight > 160;
     if(w || h){
-      if(!devtoolsOpen){
-        devtoolsOpen = true;
-        document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#0a0a1a;color:#f44;font:bold 24px Inter,sans-serif;text-align:center;padding:40px">⛔ DevTools Detected!<br><br>Vui lòng đóng Developer Tools để tiếp tục sử dụng.</div>';
+      if(!_dt){
+        _dt = true;
+        document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#0a0a1a;color:#f44;font:bold 28px Inter,sans-serif;text-align:center;padding:40px;flex-direction:column;gap:20px"><div style="font-size:60px">⛔</div><div>DevTools Detected!</div><div style="font-size:16px;color:#888">Đóng Developer Tools để tiếp tục.</div></div>';
       }
     } else {
-      if(devtoolsOpen){
-        devtoolsOpen = false;
-        location.reload();
-      }
+      if(_dt){ _dt = false; location.reload(); }
     }
-  }, 1000);
+  }, 800);
 
-  // 6. Console warning
-  console.log('%c⛔ DỪNG LẠI!', 'color:#f44;font-size:40px;font-weight:bold');
-  console.log('%cĐây là chức năng dành cho nhà phát triển. Không ai yêu cầu bạn dán code ở đây cả!', 'color:#ff9800;font-size:16px');
+  // 7. Override console methods
+  var noop = function(){};
+  try {
+    Object.defineProperty(window, 'console', {
+      get: function(){ return { log:noop, warn:noop, error:noop, info:noop, dir:noop, table:noop, trace:noop, assert:noop, clear:noop, count:noop, group:noop, groupEnd:noop, time:noop, timeEnd:noop }; },
+      set: function(){}
+    });
+  } catch(e){}
+
+  // 8. Block print
+  window.addEventListener('beforeprint', function(e){
+    document.body.style.display = 'none';
+  });
+  window.addEventListener('afterprint', function(){
+    document.body.style.display = '';
+  });
+
+  // 9. Block view-source protocol
+  if(location.protocol === 'view-source:'){
+    location.href = 'about:blank';
+  }
+
+  // 10. Detect Firebug
+  setInterval(function(){
+    if(window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized){
+      document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#0a0a1a;color:#f44;font:bold 28px Inter,sans-serif;text-align:center;padding:40px">⛔ Firebug Detected!</div>';
+    }
+  }, 2000);
+
+  // 11. Block iframe embedding (anti-framing)
+  if(window.top !== window.self){
+    window.top.location = window.self.location;
+  }
 })();
