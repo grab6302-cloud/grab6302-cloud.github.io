@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><title>QSP Admin</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a1a;color:#fff;font-family:'Segoe UI',sans-serif;padding:20px}
+h1{color:#00e676;text-align:center;margin-bottom:20px;font-size:22px}
+.tabs{display:flex;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:10px 20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;font:bold 13px sans-serif;color:#888;transition:.3s}
+.tab.active{background:rgba(0,230,118,.15);border-color:#00e676;color:#00e676}
+.page{display:none}.page.active{display:block}
+.panel{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;margin-bottom:16px;max-width:900px;margin-left:auto;margin-right:auto}
+h2{color:#00e676;font-size:15px;margin-bottom:12px}
+label{display:block;color:#888;font-size:12px;margin:6px 0 3px}
+input,select{width:100%;padding:9px;background:#0f1525;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#fff;font-size:13px}
+input:focus{border-color:#00e676;outline:none}
+button{padding:10px 20px;background:linear-gradient(135deg,#00e676,#00bcd4);color:#000;font:bold 13px sans-serif;border:none;border-radius:8px;cursor:pointer;margin:4px 2px}
+button:hover{opacity:.9}
+.btn-red{background:linear-gradient(135deg,#f44336,#ff5722)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:rgba(0,230,118,.1);color:#00e676;padding:8px;text-align:left}
+td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:#ccc}
+.valid{color:#00e676}.invalid{color:#f44336}.pending{color:#ff9800}
+.key-text{font-family:monospace;font-size:12px;color:#00e676;font-weight:bold}
+.stat{display:inline-block;background:rgba(0,230,118,.1);padding:6px 14px;border-radius:8px;margin:3px;font-size:12px}
+.stat b{color:#00e676}
+.setup-box{max-width:500px;margin:40px auto;background:rgba(255,255,255,.03);border:1px solid rgba(0,230,118,.3);padding:30px;border-radius:16px;text-align:center}
+.setup-box h2{color:#00e676;margin-bottom:16px}
+.cb{background:#333;color:#0f0;border:1px solid #0f0;padding:3px 6px;border-radius:4px;cursor:pointer;font-size:10px}
+</style>
+</head>
+<body>
+
+<div id="setup" class="setup-box" style="display:none">
+  <h2>⚙️ Setup</h2>
+  <label>Bin ID</label><input id="sBin" placeholder="69b42732...">
+  <label>Master Key</label><input id="sKey" placeholder="$2a$10$...">
+  <br><br><button onclick="doSetup()" style="padding:14px 40px">✅ Lưu</button>
+</div>
+
+<div id="app" style="display:none">
+<h1>⚙️ QSP Admin</h1>
+<div class="tabs">
+  <div class="tab active" onclick="showPage('deposits')">💰 Nạp Tiền</div>
+  <div class="tab" onclick="showPage('users')">👥 Users</div>
+  <div class="tab" onclick="showPage('keys')">🔑 Keys</div>
+  <div class="tab" onclick="showPage('purchases')">📦 Giao Dịch</div>
+</div>
+
+<!-- NẠP TIỀN -->
+<div class="page active" id="page-deposits">
+  <div class="panel">
+    <h2>💰 Yêu Cầu Nạp Tiền <button onclick="loadData()" style="padding:4px 10px;font-size:11px">🔄</button></h2>
+    <div id="depStats"></div>
+    <div id="depList"></div>
+  </div>
+</div>
+
+<!-- USERS -->
+<div class="page" id="page-users">
+  <div class="panel">
+    <h2>👥 Danh Sách Users</h2>
+    <div id="userList"></div>
+  </div>
+</div>
+
+<!-- KEYS -->
+<div class="page" id="page-keys">
+  <div class="panel">
+    <h2>🔑 Tất Cả Keys</h2>
+    <div id="keyList"></div>
+  </div>
+</div>
+
+<!-- PURCHASES -->
+<div class="page" id="page-purchases">
+  <div class="panel">
+    <h2>📦 Lịch Sử Mua Hàng</h2>
+    <div id="purchaseList"></div>
+  </div>
+</div>
+</div>
+
+<script>
+var BIN_ID='',API_KEY='',DATA={};
+try{var c=JSON.parse(localStorage.getItem('qsp_admin')||'{}');BIN_ID=c.bin||'';API_KEY=c.key||'';}catch(e){}
+if(BIN_ID&&API_KEY){document.getElementById('app').style.display='block';loadData();}
+else{document.getElementById('setup').style.display='block';document.getElementById('sBin').value='69b42732b7ec241ddc66a506';document.getElementById('sKey').value='$2a$10$oYANSzZQ3hm27sTDDedds.DbkKQZObqPZieEJ/bg8i/hnh/2SMs8u';}
+
+function doSetup(){
+  BIN_ID=document.getElementById('sBin').value.trim();
+  API_KEY=document.getElementById('sKey').value.trim();
+  if(!BIN_ID||!API_KEY){alert('Nhập đủ!');return;}
+  localStorage.setItem('qsp_admin',JSON.stringify({bin:BIN_ID,key:API_KEY}));
+  document.getElementById('setup').style.display='none';
+  document.getElementById('app').style.display='block';
+  loadData();
+}
+
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+async function getBin(){
+  var r=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':API_KEY}});
+  var j=await r.json();DATA=j.record||{};return DATA;
+}
+async function saveBin(){
+  await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(DATA)});
+}
+
+async function loadData(){
+  try{await getBin();renderDeposits();renderUsers();renderKeys();renderPurchases();}catch(e){alert('Lỗi: '+e.message);}
+}
+
+function renderDeposits(){
+  var deps=DATA._deposits||[];
+  var pending=deps.filter(d=>d.status==='pending');
+  var approved=deps.filter(d=>d.status==='approved');
+
+  document.getElementById('depStats').innerHTML=
+    '<div class="stat">Tổng: <b>'+deps.length+'</b></div>'+
+    '<div class="stat">Chờ: <b style="color:#ff9800">'+pending.length+'</b></div>'+
+    '<div class="stat">Đã duyệt: <b>'+approved.length+'</b></div>';
+
+  if(deps.length===0){document.getElementById('depList').innerHTML='<p style="color:#888;margin-top:12px">Chưa có yêu cầu nạp</p>';return;}
+
+  var html='<table><tr><th>ID</th><th>SĐT</th><th>Số tiền</th><th>Thời gian</th><th>Status</th><th></th></tr>';
+  deps.slice().reverse().forEach(function(dep,ri){
+    var i=deps.length-1-ri;
+    var st=dep.status==='pending'?'<span class="pending">⏳ Chờ</span>':'<span class="valid">✅ Duyệt</span>';
+    html+='<tr><td style="font-family:monospace;color:#00e676">'+dep.id+'</td>';
+    html+='<td><b>'+dep.phone+'</b></td>';
+    html+='<td style="color:#fff;font-weight:700">'+(dep.amount||0).toLocaleString('vi')+'đ</td>';
+    html+='<td style="font-size:11px">'+new Date(dep.created).toLocaleString('vi')+'</td>';
+    html+='<td>'+st+'</td>';
+    if(dep.status==='pending'){
+      html+='<td><button onclick="approveDep('+i+')" style="padding:6px 12px;font-size:11px">✅ Duyệt</button>';
+      html+=' <button class="btn-red" onclick="rejectDep('+i+')" style="padding:6px 12px;font-size:11px">❌</button></td>';
+    }else{html+='<td></td>';}
+    html+='</tr>';
+  });
+  html+='</table>';
+  document.getElementById('depList').innerHTML=html;
+}
+
+async function approveDep(idx){
+  var dep=DATA._deposits[idx];
+  if(!dep||dep.status!=='pending')return;
+
+  if(!DATA._users) DATA._users={};
+  if(!DATA._users[dep.phone]) DATA._users[dep.phone]={balance:0,created:Date.now()};
+  DATA._users[dep.phone].balance=(DATA._users[dep.phone].balance||0)+dep.amount;
+  dep.status='approved';
+  dep.approvedAt=Date.now();
+
+  await saveBin();
+  loadData();
+  alert('✅ Đã duyệt! Nạp '+dep.amount.toLocaleString('vi')+'đ cho '+dep.phone+'\nSố dư mới: '+DATA._users[dep.phone].balance.toLocaleString('vi')+'đ');
+}
+
+async function rejectDep(idx){
+  if(!confirm('Từ chối nạp tiền?'))return;
+  DATA._deposits[idx].status='rejected';
+  await saveBin();loadData();
+}
+
+function renderUsers(){
+  var users=DATA._users||{};
+  var list=Object.keys(users);
+  if(list.length===0){document.getElementById('userList').innerHTML='<p style="color:#888">Chưa có user</p>';return;}
+
+  var html='<table><tr><th>SĐT</th><th>Số dư</th><th>Ngày tạo</th><th></th></tr>';
+  list.forEach(function(phone){
+    var u=users[phone];
+    html+='<tr><td><b>'+phone+'</b></td><td style="color:#00e676;font-weight:700">'+(u.balance||0).toLocaleString('vi')+'đ</td>';
+    html+='<td style="font-size:11px">'+new Date(u.created||0).toLocaleDateString('vi')+'</td>';
+    html+='<td><button style="padding:4px 10px;font-size:11px" onclick="addBalance(\''+phone+'\')">💰 +Tiền</button></td></tr>';
+  });
+  html+='</table>';
+  document.getElementById('userList').innerHTML=html;
+}
+
+async function addBalance(phone){
+  var amt=prompt('Nạp thêm bao nhiêu cho '+phone+'?');
+  if(!amt)return; amt=parseInt(amt);
+  if(!amt||amt<=0)return;
+  if(!DATA._users[phone]) DATA._users[phone]={balance:0,created:Date.now()};
+  DATA._users[phone].balance=(DATA._users[phone].balance||0)+amt;
+  await saveBin();loadData();
+  alert('✅ Đã nạp '+amt.toLocaleString('vi')+'đ cho '+phone);
+}
+
+function renderKeys(){
+  var keys=DATA._keys||{};
+  var list=Object.keys(keys);
+  if(list.length===0){document.getElementById('keyList').innerHTML='<p style="color:#888">Chưa có key</p>';return;}
+
+  var html='<table><tr><th>Key</th><th>SĐT</th><th>Gói</th><th>Ngày</th><th>Status</th><th></th></tr>';
+  list.forEach(function(k){
+    var v=keys[k];
+    var valid=v.active&&(!v.expires||Date.now()<=v.expires);
+    html+='<tr><td class="key-text">'+k+'</td><td>'+(v.phone||'-')+'</td><td>'+(v.plan||'-')+'</td>';
+    html+='<td style="font-size:11px">'+new Date(v.created||0).toLocaleDateString('vi')+'</td>';
+    html+='<td>'+(valid?'<span class="valid">✅</span>':'<span class="invalid">❌</span>')+'</td>';
+    html+='<td><button class="cb" onclick="navigator.clipboard.writeText(\''+k+'\')">📋</button></td></tr>';
+  });
+  html+='</table>';
+  document.getElementById('keyList').innerHTML=html;
+}
+
+function renderPurchases(){
+  var purchases=DATA._purchases||[];
+  if(purchases.length===0){document.getElementById('purchaseList').innerHTML='<p style="color:#888">Chưa có giao dịch</p>';return;}
+
+  var total=purchases.reduce(function(s,p){return s+(p.price||0);},0);
+  var html='<div class="stat" style="margin-bottom:12px">Tổng doanh thu: <b>'+total.toLocaleString('vi')+'đ</b></div>';
+  html+='<table><tr><th>SĐT</th><th>Gói</th><th>Giá</th><th>Key</th><th>Thời gian</th></tr>';
+  purchases.slice().reverse().forEach(function(p){
+    html+='<tr><td><b>'+p.phone+'</b></td><td>'+p.plan+'</td><td style="color:#00e676;font-weight:700">'+(p.price||0).toLocaleString('vi')+'đ</td>';
+    html+='<td class="key-text">'+(p.key||'-')+'</td>';
+    html+='<td style="font-size:11px">'+new Date(p.created||0).toLocaleString('vi')+'</td></tr>';
+  });
+  html+='</table>';
+  document.getElementById('purchaseList').innerHTML=html;
+}
+</script>
+</body>
+</html>

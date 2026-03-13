@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz Helper — Công cụ hỗ trợ học tập</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0b0b1e;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--green:#00e676;--cyan:#00bcd4;--purple:#7c4dff}
+body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:hidden}
+
+/* TOP BAR */
+.topbar{position:fixed;top:0;left:0;right:0;background:rgba(11,11,30,.97);border-bottom:1px solid var(--border);padding:12px 24px;display:none;justify-content:space-between;align-items:center;z-index:500;backdrop-filter:blur(10px)}
+.topbar .user{color:var(--green);font-size:14px;font-weight:600}
+.topbar .balance{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);padding:6px 16px;border-radius:20px;color:var(--green);font-size:14px;font-weight:700;margin:0 8px}
+.topbar button{padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#ddd;font-size:13px;cursor:pointer;transition:.3s}
+.topbar button:hover{border-color:var(--green);color:var(--green)}
+.tbn{display:flex;align-items:center;gap:6px}
+
+/* HERO */
+.hero{padding:70px 20px;text-align:center;position:relative}
+.hero.logged{padding-top:90px}
+
+/* LOGIN BUTTON (top right) */
+.login-float{position:fixed;top:16px;right:16px;padding:12px 24px;background:rgba(15,21,37,.95);border:1px solid rgba(255,255,255,.15);border-radius:12px;color:#eee;font:600 15px 'Inter',sans-serif;cursor:pointer;z-index:400;backdrop-filter:blur(10px);display:flex;align-items:center;gap:8px;transition:.3s}
+.login-float:hover{border-color:var(--green);color:var(--green)}
+.login-float svg{opacity:.8}
+.badge{display:inline-block;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.35);color:var(--green);font-size:15px;font-weight:600;padding:10px 24px;border-radius:24px;margin-bottom:24px;letter-spacing:1px}
+.logo{font-size:64px;font-weight:900;background:linear-gradient(135deg,var(--green),var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.tagline{color:#ccc;font-size:22px;margin-bottom:50px;line-height:1.6}
+.features{display:flex;gap:16px;flex-wrap:nowrap;justify-content:center;max-width:950px;margin:0 auto}
+.feat{background:var(--card);border:1px solid var(--border);padding:36px 28px;border-radius:18px;flex:1;text-align:center;transition:.4s}
+.feat:hover{border-color:rgba(0,230,118,.4);transform:translateY(-6px)}
+.feat-icon{font-size:36px;margin-bottom:16px}
+.feat h3{font-size:17px;font-weight:700;color:var(--green);margin-bottom:10px}
+.feat p{font-size:15px;color:#bbb}
+
+/* BALANCE CARD */
+.bal-section{padding:50px 20px;text-align:center;display:none}
+.bal-card{max-width:520px;margin:0 auto;background:linear-gradient(135deg,#0d1a2e,#0a1628);border:1px solid rgba(0,230,118,.25);border-radius:24px;padding:40px}
+.bal-label{font-size:15px;color:#bbb;margin-bottom:6px}
+.bal-amount{font-size:52px;font-weight:900;color:var(--green);margin-bottom:18px}
+.bal-amount span{font-size:20px;color:#bbb}
+.deposit-btn{padding:16px 44px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font:bold 16px 'Inter',sans-serif;border:none;border-radius:14px;cursor:pointer;transition:.3s}
+.deposit-btn:hover{transform:scale(1.05)}
+
+/* PRICING */
+.pricing{padding:70px 20px;text-align:center}
+.section-title{font-size:40px;font-weight:800;margin-bottom:14px}
+.section-sub{color:#bbb;font-size:18px;margin-bottom:44px}
+.plans{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.plan{background:var(--card);border:1px solid var(--border);padding:36px 28px;border-radius:22px;width:230px;transition:.4s;cursor:pointer;position:relative;display:flex;flex-direction:column}
+.plan:hover{border-color:var(--green);box-shadow:0 0 50px rgba(0,230,118,.12);transform:translateY(-4px)}
+.plan-name{font-size:15px;color:#bbb;font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.plan-price{font-size:44px;font-weight:900;background:linear-gradient(135deg,#fff,#ddd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.plan-price span{font-size:16px;-webkit-text-fill-color:#aaa}
+.plan-dur{font-size:14px;color:#aaa;margin-bottom:18px}
+.plan-list{list-style:none;text-align:left;font-size:14px;color:#ccc;flex:1}
+.plan-list li{padding:6px 0;padding-left:22px;position:relative}
+.plan-list li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700}
+.plan .buy-btn{display:block;margin-top:auto;padding:14px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font:bold 15px 'Inter',sans-serif;border:none;border-radius:12px;cursor:pointer;width:100%;margin-top:28px}
+
+/* MY KEYS */
+.mykeys{padding:70px 20px;display:none}
+.mykeys h2{color:var(--green);font-size:26px;text-align:center;margin-bottom:24px}
+.key-card{max-width:620px;margin:14px auto;background:var(--card);border:1px solid rgba(0,230,118,.3);border-radius:16px;padding:24px}
+.key-val{font-family:monospace;font-size:24px;font-weight:700;color:var(--green);letter-spacing:3px;background:#0a0a1a;padding:14px;border-radius:10px;text-align:center;user-select:all;margin:10px 0}
+.key-card .copy-btn{padding:10px 24px;background:var(--green);color:#000;border:none;border-radius:8px;font:bold 14px sans-serif;cursor:pointer;display:block;margin:0 auto}
+.key-card .meta{font-size:13px;color:#aaa;margin-top:10px;text-align:center}
+.no-keys{text-align:center;color:#aaa;font-size:16px;padding:40px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(8px)}
+.modal-overlay.show{display:flex}
+.modal{background:#13132d;border:1px solid rgba(0,230,118,.25);border-radius:24px;padding:44px;max-width:480px;width:92%;text-align:center;position:relative}
+.modal-close{position:absolute;top:14px;right:18px;background:none;border:none;color:#999;font-size:26px;cursor:pointer}
+.modal h2{color:var(--green);font-size:26px;margin-bottom:8px}
+.modal .sub{color:#ccc;font-size:16px;margin-bottom:22px}
+.form-group{text-align:left;margin:12px 0}
+.form-group label{display:block;color:#ddd;font-size:14px;margin-bottom:5px;font-weight:500}
+.form-group input{width:100%;padding:16px;background:#0f1525;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#fff;font-size:17px}
+.form-group input:focus{border-color:var(--green);outline:none}
+.submit-btn{width:100%;padding:18px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font:bold 17px 'Inter',sans-serif;border:none;border-radius:12px;cursor:pointer;margin-top:16px;transition:.3s}
+.submit-btn:hover{opacity:.9}
+.info-note{font-size:14px;color:#bbb;margin-top:14px;line-height:1.6}
+.qr-wrap{background:#fff;padding:14px;border-radius:14px;display:inline-block;margin:14px 0}
+.qr-wrap img{max-width:220px;max-height:220px;display:block}
+.divider{display:flex;align-items:center;margin:22px 0;gap:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.2)}
+.divider span{color:#ccc;font-size:15px;font-weight:600}
+.social-btn{width:100%;padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#fff;font:600 16px 'Inter',sans-serif;cursor:pointer;margin:6px 0;display:flex;align-items:center;justify-content:center;gap:10px;transition:.3s}
+.social-btn:hover{border-color:var(--green);background:rgba(255,255,255,.04)}
+.social-btn img{width:22px;height:22px}
+.link-btn{background:none;border:none;color:var(--cyan);font-size:14px;cursor:pointer;margin-top:10px;text-decoration:none}
+.switch-text{color:#ccc;font-size:15px;margin-top:18px}
+.switch-text a{color:var(--green);cursor:pointer;text-decoration:none;font-weight:600}
+.pw-toggle{position:relative}
+.pw-toggle input{padding-right:50px}
+.pw-toggle .eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:#999;font-size:20px;cursor:pointer}
+
+.how{padding:70px 20px;text-align:center}
+.steps{display:flex;gap:14px;justify-content:center;flex-wrap:nowrap;max-width:850px;margin:30px auto 0}
+.step{background:var(--card);border:1px solid var(--border);padding:32px 24px;border-radius:18px;flex:1}
+.step-num{background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font-weight:800;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:18px}
+.step p{font-size:15px;color:#bbb;white-space:nowrap}
+.step b{color:#fff;display:block;margin-bottom:8px;font-size:17px}
+.footer{padding:40px 20px;text-align:center;border-top:1px solid var(--border)}
+.footer p{color:#888;font-size:14px}
+@media(max-width:700px){.logo{font-size:40px}.plans{flex-direction:column;align-items:center}.features{flex-direction:column;align-items:center}.steps{flex-direction:column;align-items:center}}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR (logged in) -->
+<div class="topbar" id="topbar">
+  <span class="user" id="topUser">📱</span>
+  <div class="tbn">
+    <span class="balance" id="topBal">0đ</span>
+    <button onclick="openDeposit()">💰 Nạp</button>
+    <button onclick="showKeys()">🔑 Key</button>
+    <button onclick="logout()">🚪</button>
+  </div>
+</div>
+
+<!-- LOGIN BUTTON (top right) -->
+<button class="login-float" id="loginWidget" onclick="openAuth()">
+  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  Đăng nhập / Đăng ký
+</button>
+
+<!-- HERO (always visible) -->
+<section class="hero" id="heroSection">
+  <div class="badge">🔥 CÔNG CỤ HỖ TRỢ HỌC TẬP</div>
+  <div class="logo">📚 Quiz Helper</div>
+  <p class="tagline">Công cụ hỗ trợ học tập — Nhanh, chính xác, tiện lợi!</p>
+  <div class="features">
+    <div class="feat"><div class="feat-icon">⚡</div><h3>Nhanh Chóng</h3><p>Hỗ trợ tức thì</p></div>
+    <div class="feat"><div class="feat-icon">🎯</div><h3>Chính Xác</h3><p>Đáp án chuẩn</p></div>
+    <div class="feat"><div class="feat-icon">🛡️</div><h3>Bảo Mật</h3><p>Thông tin an toàn</p></div>
+    <div class="feat"><div class="feat-icon">📱</div><h3>Dễ Dùng</h3><p>Không cần cài đặt</p></div>
+  </div>
+</section>
+
+<!-- BALANCE (logged in only) -->
+<section class="bal-section" id="balSection">
+  <div class="bal-card">
+    <div class="bal-label">💰 Số dư tài khoản</div>
+    <div class="bal-amount"><span id="balDisplay">0</span><span> VNĐ</span></div>
+    <button class="deposit-btn" onclick="openDeposit()">➕ Nạp tiền</button>
+  </div>
+</section>
+
+<!-- PRICING (always visible) -->
+<section class="pricing">
+  <div class="section-title">🛒 Chọn Gói</div>
+  <p class="section-sub" id="pricingSub">Đăng nhập → Nạp tiền → Mua gói → Nhận key ngay!</p>
+  <div class="plans">
+    <div class="plan" onclick="buyPlan(1,6000,'1 bài')"><div class="plan-name">1 Bài</div><div class="plan-price">6K <span>VNĐ</span></div><div class="plan-dur">1 lượt</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan" onclick="buyPlan(5,25000,'5 bài')"><div class="plan-name">5 Bài</div><div class="plan-price">25K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 5K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 17%</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan" onclick="buyPlan(10,40000,'10 bài')"><div class="plan-name">10 Bài</div><div class="plan-price">40K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 20K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 33%</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="plan" onclick="buyPlan(999,60000,'VIP tuần')"><div class="plan-name">VIP Tuần</div><div class="plan-price">60K <span>VNĐ</span></div><div class="plan-dur">Không giới hạn 7 ngày</div><ul class="plan-list"><li>Chơi thoải mái</li><li>Không giới hạn</li><li>Ưu tiên hỗ trợ</li></ul><button class="buy-btn">MUA NGAY</button></div>
+  </div>
+</section>
+
+<!-- MY KEYS (logged in) -->
+<section class="mykeys" id="myKeysSection">
+  <h2>🔑 Key Của Tôi</h2>
+  <div id="myKeysList"></div>
+</section>
+
+<section class="how">
+  <div class="section-title">📖 Cách Dùng</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><b>Đăng ký</b><p>Tạo tài khoản</p></div>
+    <div class="step"><div class="step-num">2</div><b>Nạp tiền</b><p>Quét QR</p></div>
+    <div class="step"><div class="step-num">3</div><b>Mua gói</b><p>Nhanh gọn dễ xài</p></div>
+    <div class="step"><div class="step-num">4</div><b>Nhận key</b><p>Tự động nhanh chóng</p></div>
+  </div>
+</section>
+
+<div class="footer"><p>© 2026 Quiz Helper Team</p></div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+
+    <!-- LOGIN VIEW -->
+    <div id="authLogin">
+      <h2>👋 Đăng nhập</h2>
+      <p class="sub">Đăng nhập để mua gói & nhận key</p>
+      <div class="form-group"><label>📱 Số điện thoại</label><input type="tel" id="lPhone" placeholder="09xxxxxxxx" maxlength="11"></div>
+      <div class="form-group"><label>🔒 Mật khẩu</label><div class="pw-toggle"><input type="password" id="lPass" placeholder="••••••"><button class="eye" onclick="togglePw('lPass')">👁️</button></div></div>
+      <button class="submit-btn" onclick="doLogin()">Đăng nhập</button>
+      <button class="link-btn" onclick="showForgot()">Quên mật khẩu?</button>
+      <div class="divider"><span>hoặc</span></div>
+      <button class="social-btn" onclick="socialLogin('google')">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Đăng nhập với Google
+      </button>
+      <button class="social-btn" onclick="socialLogin('facebook')">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#1877F2" d="M48 24C48 10.745 37.255 0 24 0S0 10.745 0 24c0 11.979 8.776 21.908 20.25 23.708v-16.77h-6.094V24h6.094v-5.288c0-6.014 3.583-9.337 9.065-9.337 2.625 0 5.372.469 5.372.469v5.906h-3.026c-2.981 0-3.911 1.85-3.911 3.75V24h6.656l-1.064 6.938H27.75v16.77C39.224 45.908 48 35.979 48 24z"/></svg>
+        Đăng nhập với Facebook
+      </button>
+      <p class="switch-text">Chưa có tài khoản? <a onclick="showRegister()">Đăng ký ngay</a></p>
+    </div>
+
+    <!-- REGISTER VIEW -->
+    <div id="authRegister" style="display:none">
+      <h2>📝 Đăng ký</h2>
+      <p class="sub">Tạo tài khoản miễn phí</p>
+      <div class="form-group"><label>📱 Số điện thoại</label><input type="tel" id="rPhone" placeholder="09xxxxxxxx" maxlength="11"></div>
+      <div class="form-group"><label>🔒 Mật khẩu</label><div class="pw-toggle"><input type="password" id="rPass" placeholder="Tối thiểu 4 ký tự"><button class="eye" onclick="togglePw('rPass')">👁️</button></div></div>
+      <div class="form-group"><label>🔒 Nhập lại mật khẩu</label><div class="pw-toggle"><input type="password" id="rPass2" placeholder="Nhập lại"><button class="eye" onclick="togglePw('rPass2')">👁️</button></div></div>
+      <button class="submit-btn" onclick="doRegister()">Đăng ký</button>
+      <div class="divider"><span>hoặc</span></div>
+      <button class="social-btn" onclick="socialLogin('google')">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Đăng ký với Google
+      </button>
+      <button class="social-btn" onclick="socialLogin('facebook')">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#1877F2" d="M48 24C48 10.745 37.255 0 24 0S0 10.745 0 24c0 11.979 8.776 21.908 20.25 23.708v-16.77h-6.094V24h6.094v-5.288c0-6.014 3.583-9.337 9.065-9.337 2.625 0 5.372.469 5.372.469v5.906h-3.026c-2.981 0-3.911 1.85-3.911 3.75V24h6.656l-1.064 6.938H27.75v16.77C39.224 45.908 48 35.979 48 24z"/></svg>
+        Đăng ký với Facebook
+      </button>
+      <p class="switch-text">Đã có tài khoản? <a onclick="showLogin()">Đăng nhập</a></p>
+    </div>
+
+    <!-- FORGOT PW VIEW -->
+    <div id="authForgot" style="display:none">
+      <h2>🔑 Quên mật khẩu</h2>
+      <p class="sub">Nhập SĐT đã đăng ký để đặt lại mật khẩu</p>
+      <div class="form-group"><label>📱 Số điện thoại</label><input type="tel" id="fPhone" placeholder="09xxxxxxxx" maxlength="11"></div>
+      <div class="form-group"><label>🔒 Mật khẩu mới</label><div class="pw-toggle"><input type="password" id="fNewPass" placeholder="Mật khẩu mới"><button class="eye" onclick="togglePw('fNewPass')">👁️</button></div></div>
+      <button class="submit-btn" onclick="doResetPw()">Gửi yêu cầu đổi MK</button>
+      <p class="info-note">Admin sẽ xác nhận và đổi mật khẩu trong <b>5 phút</b>.</p>
+      <p class="switch-text"><a onclick="showLogin()">← Quay lại đăng nhập</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- DEPOSIT MODAL -->
+<div class="modal-overlay" id="depositModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeDeposit()">✕</button>
+    <h2>💰 Nạp Tiền</h2>
+    <p class="sub">Quét QR → CK → Nhập số tiền</p>
+    <div class="qr-wrap">
+      <img src="qr.png" alt="QR" style="width:200px;height:200px" onerror="this.parentElement.innerHTML='<div style=\'padding:30px;color:#999\'>Chưa có QR</div>'">
+    </div>
+    <div class="form-group"><label>💵 Số tiền đã chuyển khoản</label><input type="number" id="depAmount" placeholder="VD: 50000"></div>
+    <button class="submit-btn" onclick="submitDeposit()">✅ Đã CK — Gửi yêu cầu</button>
+    <p class="info-note">Admin duyệt trong <b>5 phút</b>. Số dư tự cập nhật!</p>
+  </div>
+</div>
+
+<script>
+var _a=atob('NjliNDI3MzJiN2VjMjQxZGRjNjZhNTA2');
+var _b=atob('JDJhJDEwJG9ZQU5TelpRM2htMjdzVEREZWRkcy5EYmtLUVpPYnFQWmllRUovYmc4aS9obmgvMlNNczh1');
+var _phone='',_bal=0,_pendingBuy=null;
+
+/* Auth modal helpers */
+function openAuth(){document.getElementById('authModal').classList.add('show');showLogin();}
+function closeAuth(){document.getElementById('authModal').classList.remove('show');}
+function showLogin(){document.getElementById('authLogin').style.display='block';document.getElementById('authRegister').style.display='none';document.getElementById('authForgot').style.display='none';}
+function showRegister(){document.getElementById('authLogin').style.display='none';document.getElementById('authRegister').style.display='block';document.getElementById('authForgot').style.display='none';}
+function showForgot(){document.getElementById('authLogin').style.display='none';document.getElementById('authRegister').style.display='none';document.getElementById('authForgot').style.display='block';}
+document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)closeAuth();});
+
+function togglePw(id){var i=document.getElementById(id);i.type=i.type==='password'?'text':'password';}
+
+function socialLogin(provider){alert('🚧 Đăng nhập bằng '+provider+' sắp ra mắt!\n\nHiện tại vui lòng dùng SĐT.');}
+
+/* Register */
+async function doRegister(){
+  var phone=document.getElementById('rPhone').value.trim();
+  var pass=document.getElementById('rPass').value;
+  var pass2=document.getElementById('rPass2').value;
+  if(!phone||phone.length<9){alert('Nhập SĐT hợp lệ!');return;}
+  if(!pass||pass.length<4){alert('Mật khẩu tối thiểu 4 ký tự!');return;}
+  if(pass!==pass2){alert('Mật khẩu không khớp!');return;}
+  try{
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+    var j=await r.json();var d=j.record||{};
+    if(!d._users) d._users={};
+    if(d._users[phone]){alert('SĐT đã được đăng ký! Vui lòng đăng nhập.');showLogin();return;}
+    d._users[phone]={password:pass,balance:0,created:Date.now()};
+    await fetch('https://api.jsonbin.io/v3/b/'+_a,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':_b},body:JSON.stringify(d)});
+    alert('✅ Đăng ký thành công!');
+    _phone=phone;localStorage.setItem('qh_phone',phone);
+    closeAuth();enterApp(d);
+  }catch(e){alert('Lỗi: '+e.message);}
+}
+
+/* Login */
+async function doLogin(){
+  var phone=document.getElementById('lPhone').value.trim();
+  var pass=document.getElementById('lPass').value;
+  if(!phone||phone.length<9){alert('Nhập SĐT!');return;}
+  if(!pass){alert('Nhập mật khẩu!');return;}
+  try{
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+    var j=await r.json();var d=j.record||{};
+    var users=d._users||{};
+    if(!users[phone]){alert('SĐT chưa đăng ký!');return;}
+    if(users[phone].password!==pass){alert('❌ Sai mật khẩu!');return;}
+    _phone=phone;localStorage.setItem('qh_phone',phone);
+    closeAuth();enterApp(d);
+  }catch(e){alert('Lỗi: '+e.message);}
+}
+
+/* Forgot PW */
+async function doResetPw(){
+  var phone=document.getElementById('fPhone').value.trim();
+  var newPass=document.getElementById('fNewPass').value;
+  if(!phone||phone.length<9){alert('Nhập SĐT!');return;}
+  if(!newPass||newPass.length<4){alert('MK mới tối thiểu 4 ký tự!');return;}
+  try{
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+    var j=await r.json();var d=j.record||{};
+    if(!d._users||!d._users[phone]){alert('SĐT chưa đăng ký!');return;}
+    if(!d._pw_resets) d._pw_resets=[];
+    d._pw_resets.push({phone:phone,newPass:newPass,status:'pending',created:Date.now()});
+    await fetch('https://api.jsonbin.io/v3/b/'+_a,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':_b},body:JSON.stringify(d)});
+    alert('✅ Đã gửi yêu cầu đổi MK!\nAdmin sẽ xác nhận trong 5 phút.');
+    showLogin();
+  }catch(e){alert('Lỗi: '+e.message);}
+}
+
+function enterApp(data){
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('loginWidget').style.display='none';
+  document.getElementById('topUser').textContent='📱 '+_phone;
+  document.getElementById('heroSection').classList.add('logged');
+  document.getElementById('balSection').style.display='block';
+  document.getElementById('pricingSub').textContent='Chọn gói → trừ tiền tự động → nhận key ngay!';
+  if(data&&data._users&&data._users[_phone]){
+    _bal=data._users[_phone].balance||0;
+  }
+  updateBalUI();
+  if(_pendingBuy){var p=_pendingBuy;_pendingBuy=null;buyPlan(p[0],p[1],p[2]);}
+}
+
+function updateBalUI(){
+  document.getElementById('balDisplay').textContent=_bal.toLocaleString('vi');
+  document.getElementById('topBal').textContent=_bal.toLocaleString('vi')+'đ';
+}
+
+function logout(){
+  localStorage.removeItem('qh_phone');_phone='';_bal=0;
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('loginWidget').style.display='block';
+  document.getElementById('balSection').style.display='none';
+  document.getElementById('myKeysSection').style.display='none';
+  document.getElementById('heroSection').classList.remove('logged');
+  document.getElementById('pricingSub').textContent='Đăng nhập → Nạp tiền → Mua gói → Nhận key ngay!';
+}
+
+/* Quick login from widget */
+async function quickLogin(){
+  var phone=document.getElementById('wPhone').value.trim();
+  var pass=document.getElementById('wPass').value;
+  if(!phone||phone.length<9){alert('Nhập SĐT!');return;}
+  if(!pass){alert('Nhập mật khẩu!');return;}
+  try{
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+    var j=await r.json();var d=j.record||{};
+    var users=d._users||{};
+    if(!users[phone]){alert('SĐT chưa đăng ký! Click "Đăng ký tài khoản mới"');return;}
+    if(users[phone].password!==pass){alert('❌ Sai mật khẩu!');return;}
+    _phone=phone;localStorage.setItem('qh_phone',phone);
+    enterApp(d);
+  }catch(e){alert('Lỗi: '+e.message);}
+}
+
+/* Auto login if saved */
+(async function(){
+  _phone=localStorage.getItem('qh_phone')||'';
+  if(_phone){
+    try{
+      var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+      var j=await r.json();enterApp(j.record||{});
+    }catch(e){enterApp({});}
+  }
+})();
+
+/* Deposit */
+function openDeposit(){if(!_phone){openAuth();return;}document.getElementById('depositModal').classList.add('show');}
+function closeDeposit(){document.getElementById('depositModal').classList.remove('show');}
+document.getElementById('depositModal').addEventListener('click',function(e){if(e.target===this)closeDeposit();});
+
+async function submitDeposit(){
+  var amt=parseInt(document.getElementById('depAmount').value);
+  if(!amt||amt<1000){alert('Nhập số tiền hợp lệ (tối thiểu 1000đ)!');return;}
+  try{
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+    var j=await r.json();var d=j.record||{};
+    if(!d._deposits) d._deposits=[];
+    d._deposits.push({id:'DEP'+Date.now().toString(36).toUpperCase().slice(-6),phone:_phone,amount:amt,status:'pending',created:Date.now()});
+    await fetch('https://api.jsonbin.io/v3/b/'+_a,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':_b},body:JSON.stringify(d)});
+    closeDeposit();document.getElementById('depAmount').value='';
+    alert('✅ Đã gửi yêu cầu nạp '+amt.toLocaleString('vi')+'đ!\nAdmin duyệt trong 5 phút.');
+  }catch(e){alert('Lỗi: '+e.message);}
+}
+
+/* Buy plan */
+async function buyPlan(uses,price,label){
+  if(!_phone){_pendingBuy=[uses,price,label];openAuth();return;}
+  if(_bal<price){alert('❌ Số dư không đủ!\n\nCần: '+price.toLocaleString('vi')+'đ\nSố dư: '+_bal.toLocaleString('vi')+'đ\n\nNạp thêm tiền nhé!');openDeposit();return;}
+  if(!confirm('Mua gói '+label+' — '+price.toLocaleString('vi')+'đ?'))return;
+  try{
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+    var j=await r.json();var d=j.record||{};
+    if(!d._users||!d._users[_phone]||(d._users[_phone].balance||0)<price){alert('Số dư không đủ!');return;}
+    d._users[_phone].balance-=price;
+    var c='0123456789ABCDEF',p=function(){var s='';for(var i=0;i<4;i++)s+=c[Math.floor(Math.random()*16)];return s;};
+    var nk='QH-'+p()+'-'+p()+'-'+p();
+    if(!d._keys)d._keys={};
+    d._keys[nk]={active:true,phone:_phone,plan:label,uses:uses,created:Date.now(),expires:uses>=999?Date.now()+7*86400000:null};
+    if(!d._purchases)d._purchases=[];
+    d._purchases.push({phone:_phone,key:nk,plan:label,price:price,created:Date.now()});
+    await fetch('https://api.jsonbin.io/v3/b/'+_a,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':_b},body:JSON.stringify(d)});
+    _bal=d._users[_phone].balance;updateBalUI();
+    alert('🎉 Mua thành công!\n\n🔑 Key: '+nk+'\n\nĐã lưu trong mục Key của tôi!');
+    showKeys();
+  }catch(e){alert('Lỗi: '+e.message);}
+}
+
+/* Show keys */
+async function showKeys(){
+  if(!_phone){openAuth();return;}
+  document.getElementById('myKeysSection').style.display='block';
+  document.getElementById('myKeysSection').scrollIntoView({behavior:'smooth'});
+  document.getElementById('myKeysList').innerHTML='<p style="color:#888;text-align:center">⏳ Đang tải...</p>';
+  try{
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+_a+'/latest',{headers:{'X-Master-Key':_b}});
+    var j=await r.json();var d=j.record||{};var keys=d._keys||{};
+    var my=Object.keys(keys).filter(function(k){return keys[k].phone===_phone;});
+    if(my.length===0){document.getElementById('myKeysList').innerHTML='<div class="no-keys">Chưa có key. Mua gói để nhận key!</div>';return;}
+    var html='';
+    my.reverse().forEach(function(k){
+      var v=keys[k];var exp=v.expires?new Date(v.expires).toLocaleDateString('vi'):'Theo lượt';
+      html+='<div class="key-card"><div style="font-size:12px;color:#888">📦 '+v.plan+' — '+new Date(v.created).toLocaleDateString('vi')+'</div>';
+      html+='<div class="key-val">'+k+'</div>';
+      html+='<button class="copy-btn" onclick="navigator.clipboard.writeText(\''+k+'\');this.textContent=\'✅ Đã copy!\'">📋 Copy Key</button>';
+      html+='<div class="meta">Hết hạn: '+exp+'</div></div>';
+    });
+    document.getElementById('myKeysList').innerHTML=html;
+  }catch(e){document.getElementById('myKeysList').innerHTML='<p style="color:#f44336;text-align:center">Lỗi</p>';}
+}
+</script>
+</body>
+</html>
