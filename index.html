@@ -50,7 +50,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .login-float svg{opacity:.8}
 .badge{display:inline-block;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.35);color:var(--green);font-size:15px;font-weight:600;padding:10px 24px;border-radius:24px;margin-bottom:24px;letter-spacing:1px}
 .logo{font-size:64px;font-weight:900;background:linear-gradient(135deg,var(--green),var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
-.tagline{color:#ccc;font-size:22px;margin-bottom:50px;line-height:1.6}
+.tagline{color:#ccc;font-size:22px;margin-bottom:50px;line-height:1.6;min-height:36px}
 .features{display:flex;gap:16px;flex-wrap:nowrap;justify-content:center;max-width:950px;margin:0 auto}
 .feat{background:var(--card);border:1px solid var(--border);padding:36px 28px;border-radius:18px;flex:1;text-align:center;transition:.4s}
 .feat:hover{border-color:rgba(0,230,118,.4);transform:translateY(-6px)}
@@ -74,8 +74,10 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 .plans{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
 .plan{background:var(--card);border:1px solid var(--border);padding:36px 28px;border-radius:22px;width:230px;transition:.4s;cursor:pointer;position:relative;display:flex;flex-direction:column}
 .plan:hover{border-color:var(--green);box-shadow:0 0 50px rgba(0,230,118,.12);transform:translateY(-4px)}
-.plan.popular{border-color:rgba(0,230,118,.4)}
-.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font-size:12px;font-weight:800;padding:4px 16px;border-radius:20px;white-space:nowrap;letter-spacing:.5px}
+.plan.popular{border-color:rgba(0,230,118,.4);box-shadow:0 0 30px rgba(0,230,118,.1)}
+.plan.popular:hover{border-color:var(--green);box-shadow:0 0 50px rgba(0,230,118,.2)}
+.popular-wrap{position:relative;width:230px}
+.popular-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--green),var(--cyan));color:#000;font-size:12px;font-weight:800;padding:6px 24px;border-radius:20px;white-space:nowrap;letter-spacing:.5px;z-index:10}
 .plan-name{font-size:15px;color:#bbb;font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
 .plan-price{font-size:44px;font-weight:900;background:linear-gradient(135deg,#fff,#ddd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
 .plan-price span{font-size:16px;-webkit-text-fill-color:#aaa}
@@ -128,9 +130,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 /* INPUT GLOW */
 .form-group input:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 15px rgba(0,188,212,.15)}
 
-/* TYPING EFFECT */
-@keyframes blink{50%{border-color:transparent}}
-.typing-cursor{border-right:2px solid var(--cyan);animation:blink .8s step-end infinite;padding-right:4px}
+
 
 /* SOCIAL PROOF */
 .trust{padding:40px 20px;text-align:center}
@@ -254,7 +254,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
   <div class="plans">
     <div class="plan glow-hover" onclick="buyPlan(1,6000,'1 bài')"><div class="plan-name">1 Bài</div><div class="plan-price">6K <span>VNĐ</span></div><div class="plan-dur">1 lượt</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li></ul><button class="buy-btn">MUA NGAY</button></div>
     <div class="plan glow-hover" onclick="buyPlan(5,25000,'5 bài')"><div class="plan-name">5 Bài</div><div class="plan-price">25K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 5K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 17%</li></ul><button class="buy-btn">MUA NGAY</button></div>
-    <div class="plan glow-hover popular" onclick="buyPlan(10,40000,'10 bài')"><div class="popular-badge">⭐ PHỔ BIẾN NHẤT</div><div class="plan-name">10 Bài</div><div class="plan-price">40K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 20K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 33%</li></ul><button class="buy-btn">MUA NGAY</button></div>
+    <div class="popular-wrap"><div class="popular-badge">⭐ PHỔ BIẾN NHẤT</div><div class="plan glow-hover popular" onclick="buyPlan(10,40000,'10 bài')" style="width:100%"><div class="plan-name">10 Bài</div><div class="plan-price">40K <span>VNĐ</span></div><div class="plan-dur">Tiết kiệm 20K</div><ul class="plan-list"><li>Auto trả lời</li><li>Highlight đáp án</li><li>Tiết kiệm 33%</li></ul><button class="buy-btn">MUA NGAY</button></div></div>
     <div class="plan glow-hover" onclick="buyPlan(999,60000,'VIP tuần')"><div class="plan-name">VIP Tuần</div><div class="plan-price">60K <span>VNĐ</span></div><div class="plan-dur">Không giới hạn 7 ngày</div><ul class="plan-list"><li>Chơi thoải mái</li><li>Không giới hạn</li><li>Ưu tiên hỗ trợ</li></ul><button class="buy-btn">MUA NGAY</button></div>
   </div>
 </section>
@@ -304,7 +304,7 @@ body{background:var(--bg);color:#eee;font-family:'Inter',sans-serif;overflow-x:h
 
 <!-- CONTACT ADMIN -->
 <div class="contact-float">
-  <a class="contact-btn" href="https://zalo.me/0123456789" target="_blank">💬 Zalo Admin</a>
+  <a class="contact-btn" href="https://zalo.me/0969869474" target="_blank">💬 Zalo Admin</a>
 </div>
 
 <!-- LOADING OVERLAY -->
@@ -407,10 +407,9 @@ document.addEventListener('keydown',function(e){
   var text='Công cụ hỗ trợ học tập — Nhanh, chính xác, tiện lợi!';
   var el=document.getElementById('taglineText');
   var i=0;
-  el.classList.add('typing-cursor');
   function type(){
     if(i<text.length){el.textContent+=text[i];i++;setTimeout(type,40);}
-    else{setTimeout(function(){el.classList.remove('typing-cursor');},1500);}
+    else{el.style.borderRight='none';}
   }
   setTimeout(type,500);
 })();
@@ -433,9 +432,13 @@ function animateCounter(id,target){
     var j=await r.json();var d=j.record||{};
     var users=Object.keys(d._users||{}).length;
     var keys=Object.keys(d._keys||{}).length;
-    animateCounter('cntUsers',users||1);
-    animateCounter('cntKeys',keys||0);
-  }catch(e){}
+    // Baseline 200 key
+    animateCounter('cntUsers', users + 47);
+    animateCounter('cntKeys', 200);
+  }catch(e){
+    animateCounter('cntUsers', 48);
+    animateCounter('cntKeys', 200);
+  }
 })();
 
 /* Toast notification */
@@ -681,22 +684,29 @@ function hideLoading(){document.getElementById('loadingOverlay').classList.remov
 
 /* Activity ticker - social proof */
 (function(){
-  var names=['Minh','Hưng','Linh','Trang','Đức','Hà','Nam','Phương','Tuấn','Thảo','Khoa','Mai','Long','Vy','Bảo'];
-  var plans=['1 Bài','5 Bài','10 Bài','VIP Tuần'];
-  var times=['vừa xong','2 phút trước','5 phút trước','10 phút trước'];
+  var names=['Minh','Hưng','Linh','Trang','Đức','Hà','Nam','Phương','Tuấn','Thảo','Khoa','Mai','Long','Vy','Bảo','Dũng','Như','An','Hoàng','Thư'];
+  var plans=['1 Bài','5 Bài','10 Bài','VIP Tuần','10 Bài','5 Bài']; // 10 Bài xuất hiện nhiều hơn
+  var times=['vừa xong','1 phút trước','3 phút trước','5 phút trước','8 phút trước','12 phút trước'];
+  var prefixes=['096','097','098','091','093','094','088','090','089','092'];
   function showActivity(){
     var ticker=document.getElementById('activityTicker');
     var n=names[Math.floor(Math.random()*names.length)];
     var p=plans[Math.floor(Math.random()*plans.length)];
     var t=times[Math.floor(Math.random()*times.length)];
-    var phone='0'+Math.floor(Math.random()*9+1)+'***'+Math.floor(Math.random()*90+10);
+    var pre=prefixes[Math.floor(Math.random()*prefixes.length)];
+    var phone=pre+'*****'+Math.floor(Math.random()*90+10);
     var div=document.createElement('div');
     div.className='activity-toast';
     div.innerHTML='🛒 <span class="act-name">'+phone+' ('+n+')</span> đã mua gói <b>'+p+'</b><div class="act-time">'+t+'</div>';
     ticker.appendChild(div);
+    // Không cộng counter nữa (giữ mức 200)
     setTimeout(function(){div.style.animation='slideOut .4s ease forwards';setTimeout(function(){div.remove();},400);},4000);
   }
-  setTimeout(function(){showActivity();setInterval(showActivity,15000);},8000);
+  // 15 phút 1 lần
+  function scheduleNext(){
+    setTimeout(function(){showActivity();scheduleNext();},900000);
+  }
+  setTimeout(function(){showActivity();scheduleNext();},15000);
 })();
 /* Floating stars background */
 (function(){
