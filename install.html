@@ -1,274 +1,207 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QSP — Cài Đặt Tool</title>
-<script src="shield.js"></script>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="QSP - Cài đặt công cụ hỗ trợ học tập">
+<meta name="theme-color" content="#0b0b1e">
+<title>QSP — Cài đặt</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="shield.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a1a;color:#fff;font-family:'Inter',sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:30px}
-.box{background:linear-gradient(135deg,#0f1525,#1a1a3e);padding:50px;border-radius:28px;max-width:900px;width:100%;text-align:center;box-shadow:0 0 100px rgba(0,188,212,.12);border:1px solid rgba(0,188,212,.18)}
-h1{background:linear-gradient(135deg,#00e676,#00bcd4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:42px;margin-bottom:6px;font-weight:900}
-.ver{color:#666;font-size:14px;margin-bottom:32px;letter-spacing:2px}
-.modes{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
-.mode{flex:1;min-width:210px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:30px 20px;text-align:center;transition:.3s;display:flex;flex-direction:column}
-.mode:hover{border-color:rgba(0,188,212,.3);transform:translateY(-4px);box-shadow:0 10px 40px rgba(0,0,0,.3)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}
+:root{--bg:#0b0b1e;--green:#00e676;--cyan:#00bcd4}
+body{background:var(--bg);color:#fff;font-family:'Inter',sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:30px}
+.box{background:linear-gradient(135deg,rgba(15,21,37,.95),rgba(26,26,62,.95));padding:50px;border-radius:28px;max-width:900px;width:100%;text-align:center;box-shadow:0 0 120px rgba(0,188,212,.08);border:1px solid rgba(0,188,212,.12);backdrop-filter:blur(20px)}
+h1{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:38px;margin-bottom:6px;font-weight:900}
+.sub{color:rgba(255,255,255,.5);font-size:14px;margin-bottom:28px}
+.modes{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:32px}
+.mode{flex:1;min-width:220px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:30px 20px;text-align:center;transition:.4s;display:flex;flex-direction:column}
+.mode:hover{border-color:rgba(0,188,212,.25);transform:translateY(-6px);box-shadow:0 16px 50px rgba(0,0,0,.3)}
 .mode-icon{font-size:48px;margin-bottom:12px}
-.mode-name{font-weight:800;font-size:20px;margin-bottom:8px}
-.mode .desc{color:#999;font-size:15px;line-height:1.6;margin-bottom:20px;flex:1}
-.bm{display:inline-block;margin-top:auto;width:100%;padding:16px 0;color:#000;font:bold 17px 'Inter',sans-serif;border-radius:14px;text-decoration:none;cursor:grab;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
+.mode-name{font-weight:800;font-size:18px;margin-bottom:8px;color:#fff}
+.mode .desc{color:rgba(255,255,255,.5);font-size:14px;line-height:1.6;margin-bottom:20px;flex:1}
+.bm{display:inline-block;margin-top:auto;width:100%;padding:16px 0;color:#000;font:bold 16px 'Inter',sans-serif;border-radius:14px;text-decoration:none;cursor:grab;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
 .bm:hover{transform:scale(1.06);box-shadow:0 8px 30px rgba(0,0,0,.5)}
-.bm-harvest{background:linear-gradient(135deg,#f44336,#ff9800)}
-.bm-highlight{background:linear-gradient(135deg,#00bcd4,#2196F3)}
-.bm-auto{background:linear-gradient(135deg,#00e676,#00bcd4)}
-.tag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:12px;letter-spacing:.5px}
-.tag-free{background:rgba(0,230,118,.15);color:#00e676;border:1px solid rgba(0,230,118,.2)}
-.tag-key{background:rgba(0,188,212,.15);color:#00bcd4;border:1px solid rgba(0,188,212,.2)}
-
-.divider{border-top:1px solid rgba(255,255,255,.06);margin:32px 0}
-.steps{text-align:left;max-width:680px;margin:0 auto}
-.step{background:rgba(0,0,0,.3);padding:18px 22px;border-radius:14px;margin:10px 0;font-size:16px;border:1px solid rgba(255,255,255,.04);line-height:1.7;color:#ccc}
-.step b{color:#00e676}
-.step .red{color:#f44}
-.step .cyan{color:#00bcd4}
-.step .orange{color:#ff9800}
-.warn{background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);padding:16px 22px;border-radius:12px;font-size:15px;color:#ff9800;margin-top:24px;line-height:1.7}
-.note{color:#666;font-size:13px;margin-top:22px}
+.bm-harvest{background:linear-gradient(135deg,#f44336,#ff9800);color:#fff}
+.bm-highlight{background:linear-gradient(135deg,var(--cyan),#2196F3);color:#fff}
+.bm-auto{background:linear-gradient(135deg,var(--green),var(--cyan))}
+.note{color:rgba(255,255,255,.3);font-size:12px;margin-top:20px;line-height:1.8}
+.step{background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.15);border-radius:14px;padding:18px 24px;margin-top:24px;text-align:left;font-size:13px;color:rgba(255,255,255,.6);line-height:1.8}
+.step b{color:var(--green)}
 </style>
 </head>
 <body>
 <div class="box">
-<h1>🎯 QSP ULTIMATE</h1>
-<p class="ver">v10 — CLOUD SYNC EDITION</p>
+<h1>🎯 QSP Install</h1>
+<p class="sub">Kéo nút bên dưới vào thanh Bookmark để sử dụng</p>
 
 <div class="modes">
-  <!-- HARVEST -->
   <div class="mode">
     <div class="mode-icon">💀</div>
-    <div class="tag tag-free">MIỄN PHÍ</div>
     <div class="mode-name">DÒ ĐÁP ÁN</div>
-    <div class="desc">Mở <b>Firefox Ẩn Danh</b><br>Tool tự quét &amp; lưu đáp án lên cloud<br><span style="color:#f44;font-weight:bold;font-size:12px">⚠️ Chỉ dùng được trên Laptop/PC</span></div>
+    <div class="desc">Tự động chơi quiz<br>Lưu đáp án lên Cloud</div>
     <a class="bm bm-harvest" id="bmHarvest">💀 DÒ</a>
   </div>
 
-  <!-- HIGHLIGHT -->
   <div class="mode">
     <div class="mode-icon">🔍</div>
-    <div class="tag tag-key">CẦN KEY</div>
     <div class="mode-name">CHỈ XEM</div>
-    <div class="desc">Highlight đáp án đúng<br>Delay 6-10s ngẫu nhiên<br><b>Không auto click</b></div>
+    <div class="desc">Highlight đáp án đúng<br>Không tự click</div>
     <a class="bm bm-highlight" id="bmHighlight">🔍 CHỈ XEM</a>
   </div>
 
-  <!-- AUTO -->
   <div class="mode">
     <div class="mode-icon">🎯</div>
-    <div class="tag tag-key">CẦN KEY</div>
     <div class="mode-name">FULL AUTO</div>
-    <div class="desc">Highlight + Auto click<br>Delay 6-10s ngẫu nhiên<br><b>Tự động hoàn toàn</b></div>
+    <div class="desc">Highlight + Tự click<br>Hoàn toàn tự động</div>
     <a class="bm bm-auto" id="bmAuto">🎯 AUTO</a>
   </div>
 </div>
 
-<div class="divider"></div>
-
-<div class="steps">
-  <div class="step"><b>Bước 1:</b> Mở trang này trên trình duyệt <span class="orange">(Khuyên dùng Firefox)</span></div>
-  <div class="step"><b>Bước 2 (Máy Tính):</b> <span class="orange">Kéo thả nút trên</span> vào <b>thanh Bookmark</b> (Ctrl+Shift+B).<br><b>Bước 2 (Điện Thoại):</b> Nhấn thẳng vào nút để <b>Copy code</b> → Mở Chrome/Safari chọn <b>Thêm Dấu Trang mới</b> → Dán code vào ô <b>"Địa chỉ" (URL)</b>.</div>
-  <div class="step"><b>Bước 3 <span class="red">(DÒ):</span></b> Mở <b>Tab Ẩn Danh</b> (Ctrl+Shift+P) → mở quiz → click bookmark <span class="red">💀 DÒ</span> → chờ đáp án tự lưu</div>
-  <div class="step"><b>Bước 4 <span class="cyan">(CHƠI):</span></b> Firefox → mở quiz → click bookmark <span class="cyan">🔍 CHỈ XEM</span> hoặc <span style="color:#00e676">🎯 AUTO</span></div>
+<div class="step">
+  <b>Hướng dẫn:</b><br>
+  1️⃣ Kéo nút vào thanh <b>Bookmark</b> của trình duyệt<br>
+  2️⃣ Mở trang <b>Wayground/Quizizz</b><br>
+  3️⃣ Bấm bookmark vừa lưu → <b>Nhập License Key</b><br>
+  4️⃣ Tool tự động chạy! ✨
 </div>
 
-<div class="warn">
-  ⚠️ <b>Lưu ý Quan Trọng:</b><br>
-  - Các công cụ trên hoạt động trực tiếp qua Cloud, <b>không cần tải hay cài đặt thêm phần mềm gì</b>!<br>
-  - Khi dùng <b>💀 DÒ</b>, bắt buộc phải mở bằng <b>Tab Ẩn Danh</b> (Incognito / Private Window) để tránh xung đột tài khoản với tab làm bài thật.
-</div>
-
-<p class="note">© QSP Ultimate v10 — Data synced via cloud</p>
+<p class="note">⚠️ Nếu không thấy thanh Bookmark: Ctrl+Shift+B (Windows) hoặc Cmd+Shift+B (Mac)</p>
 </div>
 
 <script>
-// ⚡ QSP Engine
-var _0x=['TmpsbU5ESTNNekppTjJWak1qUXhaR1JqTmpaaE5UQTInew==','SkRKaEpERXdKRzlaUVU1VFVscFJNMmh0TWpkelZFUkVaV1JrY3k1RVltdExVVnBQWW5GUVdtbGxSVW92WW1jNGFTOW9ibWd2TWxOTmN6aDEnew=='];
-function _q(i){return atob(atob(_0x[i]).slice(0,-3));}
-var B_ID = _q(0);
-var B_KEY = _q(1);
+var B_ID='69b42732b7ec241ddc66a506';
+var B_KEY='$2a$10$oYANSzZQ3hm27sTDDedds.DbkKQZObqPZieEJ/bg8i/hnh/2SMs8u';
 
-function getBM(mode) {
-  var code = `javascript:(function(){
-    var MODE='${mode}', B_ID='${B_ID}', B_KEY='${B_KEY}';
-    var k=localStorage.getItem('qsp_key');
-    if(!k){ k=prompt('🔑 Nhập License Key:'); if(!k)return; }
-    
-    var p=document.createElement('div');
-    p.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:#1a1a2e;color:#0f0;padding:12px;border-radius:12px;font:bold 13px monospace;border:2px solid #00e676';
-    p.innerText='⏳ Đang load...'; document.body.appendChild(p);
-    function log(m,c){ p.innerText=m; if(c) p.style.borderColor=c;}
-
-    fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}}).then(r=>r.json()).then(j=>{
-      var d=j.record||j; var keys=d._keys||{}; var ans=d._answers||{};
-      var kInfo=keys[k];
-      
-      if(!kInfo || !kInfo.active) { log('❌ Key sai/bị khóa!','#f44'); localStorage.removeItem('qsp_key'); return; }
-      if(kInfo.expires && Date.now() > kInfo.expires) { log('❌ Key VIP đã hết hạn!','#f44'); localStorage.removeItem('qsp_key'); return; }
-      
-      // 1. Check Device Lock
-      var did=localStorage.getItem('qsp_did');
-      if(!did){did=Date.now().toString(36)+Math.random().toString(36).substr(2); localStorage.setItem('qsp_did',did);}
-      
-      var needsSync=false;
-      if(!kInfo.did){ kInfo.did=did; needsSync=true; }
-      else if(kInfo.did!==did){ log('❌ Key đăng nhập ở máy khác!','#f44'); return; }
-      
-      // 2. Check Quizzes used
-      var qUrl=location.host+location.pathname;
-      if(!kInfo.quizzes) kInfo.quizzes=[];
-      if(kInfo.quizzes.indexOf(qUrl)===-1){
-         if(kInfo.uses<999 && kInfo.quizzes.length>=kInfo.uses){
-             log('❌ Key đã hết lượt bài! Vui lòng gia hạn.','#ff9800'); return;
-         }
-         kInfo.quizzes.push(qUrl);
-         needsSync=true;
-      }
-      
-      var proceed=function(){
-        localStorage.setItem('qsp_key',k);
-        if(MODE==='auto' && kInfo.plan && kInfo.plan.toLowerCase().indexOf('chỉ xem')>-1){
-          MODE='highlight'; log('⚠️ Gói của bạn chỉ chạy Highlight!','#ff9800');
-        } else {
-          log('✅ '+(MODE==='auto'?'🎯 AUTO':'🔍 CHỈ XEM')+' 100%','#00e676');
-        }
-
-      var _lq='';
-      function tick(){
-        try {
-          var qs=document.querySelectorAll('[class*="question"], [data-testid*="question"], h1, h2, h3, .prompt');
-          var qE=null; qs.forEach(e=>{if(e.textContent.trim().length>10 && !qE)qE=e});
-          if(!qE)return; var q=qE.textContent.trim(); if(q===_lq)return; _lq=q;
-          
-          var os=document.querySelectorAll('button.option, [role="option"], [class*="answer"], [class*="choice"]');
-          var ot=[]; os.forEach(e=>ot.push(e.textContent.trim()));
-          
-          var a=null; var q_strip=q.replace(/<[^>]*>/g,'').replace(/\\s+/g,' ').trim().toLowerCase();
-          if(ans[q_strip]) a=ans[q_strip];
-          else {
-            var w=q_strip.split(' ').filter(x=>x.length>2); var bS=0;
-            for(var key in ans){
-              var m=0; w.forEach(wx=>{if(key.indexOf(wx)>-1)m++;});
-              var s=w.length>0 ? m/w.length : 0;
-              if(s>bS && s>0.6){ bS=s; a=ans[key]; }
-            }
-          }
-          
-          if(a){
-            var idx=-1;
-            for(var i=0;i<ot.length;i++){
-              var ots=ot[i].replace(/<[^>]*>/g,'').replace(/\\s+/g,' ').trim().toLowerCase();
-              for(var val of a){
-                if(ots===val || ots.indexOf(val)>-1 || val.indexOf(ots)>-1){idx=i; break;}
-              }
-              if(idx>-1) break;
-            }
-            if(idx>-1 && idx<os.length){
-              var dl=6000+Math.floor(Math.random()*4000); log('⏱️ Chờ '+(dl/1000).toFixed(1)+'s...','#ff9800');
-              setTimeout(()=>{
-                os[idx].style.cssText+=';box-shadow:0 0 25px #00e676!important;border:3px solid #00e676!important;position:relative;z-index:9999;transition:.3s;';
-                log('✅ Đáp án #'+(idx+1),'#00e676');
-                if(MODE==='auto'){
-                  setTimeout(()=>{os[idx].click();log('🖱️ Đã click!','#00e676');}, 500+Math.floor(Math.random()*1500));
-                }
-              }, dl);
-            } else { log('❓ Chưa có đáp án','#ff5722'); }
-          } else { log('❓ Chưa có đáp án','#ff5722'); }
-        } catch(e){}
-      }
-      
-      // Khởi động
-      if(needsSync){
-        log('⏳ Đang lưu dữ liệu Cloud...','#ff9800');
-        fetch('https://api.jsonbin.io/v3/b/'+B_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':B_KEY},body:JSON.stringify(d)})
-        .then(function(r){ proceed(); setInterval(tick,1500); })
-        .catch(function(e){ log('❌ Lỗi lưu Cloud!','#f44'); });
-      } else { 
-        proceed(); setInterval(tick,1500); 
-      }
-    }).catch(e=>log('❌ Lỗi kết nối server!','#f44'));
-  })();`;
-  
-  // Nén bookmarklet text format
-  return code.replace(/\n\s+/g, '');
+// ========== AUTO / CHỈ XEM (with key check) ==========
+function getBM(mode){
+  var c="javascript:void((function(){";
+  c+="var MODE='"+mode+"',B_ID='"+B_ID+"',B_KEY='"+B_KEY+"';";
+  c+="var k=localStorage.getItem('qsp_key');";
+  c+="if(!k){k=prompt('🔑 Nhập License Key:');if(!k)return;localStorage.setItem('qsp_key',k)}";
+  c+="var p=document.createElement('div');";
+  c+="p.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:%231a1a2e;color:%230f0;padding:12px 16px;border-radius:12px;font:bold 13px monospace;border:2px solid %2300e676;max-width:300px;box-shadow:0 4px 20px rgba(0,0,0,.5)';";
+  c+="p.innerText='⏳ Đang kiểm tra...';document.body.appendChild(p);";
+  c+="function log(m,cl){p.innerText=m;if(cl)p.style.borderColor=cl;}";
+  // Fetch data and validate key
+  c+="fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}}).then(function(r){return r.json()}).then(function(j){";
+  c+="var d=j.record||j;var keys=d._keys||{};var ans=d._answers||{};";
+  // Key validation
+  c+="if(!keys[k]||!keys[k].active){log('❌ Key không hợp lệ!','%23f44');localStorage.removeItem('qsp_key');return}";
+  c+="var ki=keys[k];";
+  // Device lock
+  c+="var did=navigator.userAgent.substring(0,50)+screen.width+'x'+screen.height;";
+  c+="if(ki.device&&ki.device!==did){log('❌ Key đã dùng trên máy khác!','%23f44');return}";
+  c+="if(!ki.device){ki.device=did;ki.needsSync=true}";
+  // Expiry check
+  c+="if(ki.expires&&Date.now()>ki.expires){log('❌ Key đã hết hạn!','%23f44');return}";
+  // Quiz limit
+  c+="if(!ki.used)ki.used=0;var lim=ki.limit||50;if(ki.used>=lim){log('❌ Hết lượt! ('+ki.used+'/'+lim+')','%23f44');return}";
+  c+="ki.used++;";
+  // Save device lock + usage
+  c+="if(ki.needsSync||true){delete ki.needsSync;d._keys[k]=ki;";
+  c+="fetch('https://api.jsonbin.io/v3/b/'+B_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':B_KEY},body:JSON.stringify(d)})}";
+  c+="log('✅ '+(MODE==='auto'?'🎯 AUTO':'🔍 XEM')+' | Còn '+(lim-ki.used)+' lượt','%2300e676');";
+  c+="var lq='';";
+  // Clean function
+  c+="function cln(s){return s.replace(/^\\\\d+\\\\/\\\\d+/,'').replace(/^[\\\\s.]+/,'').replace(/^\\\\+\\\\d+\\\\s*/,'').replace(/\\\\d+$/,'').replace(/\\\\s+/g,' ').trim().toLowerCase()}";
+  c+="function tick(){try{";
+  // Reattempt dice
+  c+="var rb=document.querySelectorAll('button.selector-item');";
+  c+="if(rb.length>0){rb[rb.length-1].click();log('🎲 Reattempt!','%23ff9800');return}";
+  // Question
+  c+="var qs=document.querySelectorAll('[class*=question],[data-testid*=question],.prompt,h1,h2');";
+  c+="var qE=null;qs.forEach(function(e){if(e.textContent.trim().length>10&&!qE)qE=e});";
+  c+="if(!qE)return;var q=qE.textContent.trim();if(q===lq)return;lq=q;";
+  // Options (Wayground specific)
+  c+="var os=document.querySelectorAll('button.option,[role=option],[class*=answer],[class*=choice]');";
+  c+="if(os.length<2)return;";
+  c+="var ot=[];os.forEach(function(e){ot.push(cln(e.textContent.trim()))});";
+  c+="var a=null;var qs2=cln(q.replace(/<[^>]*>/g,''));";
+  c+="if(ans[qs2])a=ans[qs2];";
+  c+="else{var w=qs2.split(' ').filter(function(x){return x.length>2});var bS=0;";
+  c+="for(var kk in ans){var ck=cln(kk);var m=0;w.forEach(function(wx){if(ck.indexOf(wx)>-1)m++});";
+  c+="var sc=w.length>0?m/w.length:0;if(sc>bS&&sc>0.5){bS=sc;a=ans[kk]}}}";
+  c+="if(a){var idx=-1;";
+  c+="for(var i=0;i<ot.length;i++){var ots=ot[i];";
+  c+="for(var v=0;v<a.length;v++){var av=cln(a[v]);if(ots===av||ots.indexOf(av)>-1||av.indexOf(ots)>-1){idx=i;break}}if(idx>-1)break}";
+  c+="if(idx>-1&&idx<os.length){var dl=6000+Math.floor(Math.random()*4000);log('⏱️ '+(dl/1000).toFixed(1)+'s... (còn '+(lim-ki.used)+')','%23ff9800');";
+  c+="setTimeout(function(){os[idx].style.cssText+=';box-shadow:0 0 25px %2300e676!important;border:3px solid %2300e676!important;z-index:9999';";
+  c+="log('✅ Đáp án #'+(idx+1),'%2300e676');";
+  c+="if(MODE==='auto'){setTimeout(function(){os[idx].click();log('🖱️ Clicked!','%2300e676')},500+Math.floor(Math.random()*1500))}},dl)}";
+  c+="else{log('❓ Chưa có đáp án','%23ff5722')}}else{log('❓ Chưa có đáp án','%23ff5722')}";
+  c+="}catch(e){log('⚠️ '+e.message,'%23f44')}}";
+  c+="setInterval(tick,1500)";
+  c+="}).catch(function(e){log('❌ Lỗi mạng!','%23f44')})";
+  c+="})())";
+  return c;
 }
 
-var hCode = `javascript:(function(){
-  var B_ID='${B_ID}', B_KEY='${B_KEY}';
-  var p=document.createElement('div');
-  p.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:#1a1a2e;color:#ff9800;padding:12px;border-radius:12px;font:bold 13px monospace;border:2px solid #ff9800';
-  p.innerText='💀 DÒ: KHỞI ĐỘNG...'; document.body.appendChild(p);
-
-  var _lh='', ansCache=null;
-  function tick(){
-    try {
-      var qs=document.querySelectorAll('[class*="question"], [data-testid*="question"], h1, h2, h3, .prompt');
-      var qE=null; qs.forEach(e=>{if(e.textContent.trim().length>10 && !qE)qE=e});
-      if(!qE)return; var q=qE.textContent.trim(); if(q===_lh)return;
-      
-      var cs=document.querySelectorAll('[class*="correct"], [data-correct="true"], .right-answer, [style*="green"], [class*="success"]');
-      if(cs.length===0)return; _lh=q;
-      
-      var as=[]; cs.forEach(e=>as.push(e.textContent.trim().toLowerCase()));
-      var sq=q.replace(/<[^>]*>/g,'').replace(/\\s+/g,' ').trim().toLowerCase();
-      
-      p.innerText='☁️ Đang lưu lên Cloud...';
-      fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}})
-      .then(r=>r.json()).then(j=>{
-        var d=j.record||j; if(!d._answers)d._answers={};
-        if(!d._answers[sq]) d._answers[sq]=[];
-        as.forEach(a=>{ var sa=a.replace(/<[^>]*>/g,'').replace(/\\s+/g,' ').trim(); if(d._answers[sq].indexOf(sa)<0) d._answers[sq].push(sa); });
-        
-        fetch('https://api.jsonbin.io/v3/b/'+B_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':B_KEY},body:JSON.stringify(d)})
-        .then(()=>{ p.innerText='💀 Đã lưu câu hỏi!'; setTimeout(()=>p.innerText='💀 DÒ: Đang chờ...',2000); });
-      });
-    } catch(e){}
-  }
-  setInterval(tick,1500);
-})();`.replace(/\n\s+/g, '');
-  return hCode;
+// ========== DÒ (with key check) ==========
+function getBMHarvest(){
+  var c="javascript:void((function(){";
+  c+="var B_ID='"+B_ID+"',B_KEY='"+B_KEY+"';";
+  c+="var k=localStorage.getItem('qsp_key');";
+  c+="if(!k){k=prompt('🔑 Nhập License Key:');if(!k)return;localStorage.setItem('qsp_key',k)}";
+  c+="var p=document.createElement('div');";
+  c+="p.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:%231a1a2e;color:%23ff9800;padding:14px 16px;border-radius:12px;font:bold 13px monospace;border:2px solid %23ff9800;max-width:300px;box-shadow:0 4px 20px rgba(0,0,0,.5)';";
+  c+="p.innerText='💀 DÒ: Kiểm tra key...';document.body.appendChild(p);";
+  c+="fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}}).then(function(r){return r.json()}).then(function(j){";
+  c+="var d=j.record||j;var keys=d._keys||{};";
+  c+="if(!keys[k]||!keys[k].active){p.innerText='❌ Key không hợp lệ!';p.style.borderColor='%23f44';localStorage.removeItem('qsp_key');return}";
+  c+="var ki=keys[k];";
+  c+="var did=navigator.userAgent.substring(0,50)+screen.width+'x'+screen.height;";
+  c+="if(ki.device&&ki.device!==did){p.innerText='❌ Key đã dùng trên máy khác!';return}";
+  c+="if(!ki.device){ki.device=did}";
+  c+="if(ki.expires&&Date.now()>ki.expires){p.innerText='❌ Key đã hết hạn!';return}";
+  c+="p.innerText='💀 DÒ: Đang chạy...';";
+  c+="var lh='',saved=0,clicked=false;";
+  c+="function cln(s){return s.replace(/^\\\\d+\\\\/\\\\d+/,'').replace(/^[\\\\s.]+/,'').replace(/^\\\\+\\\\d+\\\\s*/,'').replace(/\\\\d+$/,'').replace(/\\\\s+/g,' ').trim().toLowerCase()}";
+  c+="function tick(){try{";
+  // Reattempt dice (pick 3 dots = last)
+  c+="var rb=document.querySelectorAll('button.selector-item');";
+  c+="if(rb.length>0){rb[rb.length-1].click();p.innerText='🎲 Reattempt! ('+saved+')';return}";
+  // Popups
+  c+="var fb=document.querySelectorAll('[class*=modal] button,[class*=overlay] button');";
+  c+="fb.forEach(function(b){var t=b.textContent.trim().toLowerCase();if(t==='ok'||t==='continue'||t==='next'||t==='skip'||t==='close'){b.click()}});";
+  // Question
+  c+="var qs=document.querySelectorAll('[class*=question],[data-testid*=question],.prompt,h1,h2');";
+  c+="var qE=null;qs.forEach(function(e){if(e.textContent.trim().length>10&&!qE)qE=e});";
+  c+="if(!qE){p.innerText='💀 Chờ câu hỏi... ('+saved+')';return}";
+  c+="var q=qE.textContent.trim();";
+  // Options
+  c+="var os=document.querySelectorAll('button.option,[role=option],[class*=answer],[class*=choice]');";
+  c+="if(os.length<2)return;";
+  c+="if(q!==lh){lh=q;clicked=false}";
+  // Correct answer detection
+  c+="var cs=document.querySelectorAll('[class*=correct],[class*=Correct],[data-correct=true],[aria-label*=correct],[class*=is-correct]');";
+  c+="if(cs.length>0){";
+  c+="var as=[];cs.forEach(function(e){var t=cln(e.textContent.trim());if(t.length>0)as.push(t)});";
+  c+="var sq=cln(q.replace(/<[^>]*>/g,''));";
+  c+="p.innerText='☁️ Saving...';";
+  c+="fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}}).then(function(r){return r.json()}).then(function(j2){";
+  c+="var d2=j2.record||j2;if(!d2._answers)d2._answers={};";
+  c+="if(!d2._answers[sq])d2._answers[sq]=[];";
+  c+="var nw=false;as.forEach(function(a){if(a&&d2._answers[sq].indexOf(a)<0){d2._answers[sq].push(a);nw=true}});";
+  c+="if(nw){fetch('https://api.jsonbin.io/v3/b/'+B_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':B_KEY},body:JSON.stringify(d2)}).then(function(){saved++;p.innerText='✅ Saved! ('+saved+')'})}";
+  c+="else{p.innerText='✅ Có rồi ('+saved+')'}});";
+  // Click Next
+  c+="setTimeout(function(){document.querySelectorAll('button').forEach(function(n){var t=n.textContent.trim().toLowerCase();if(t==='next'||t.indexOf('next')>-1||t.indexOf('continue')>-1){n.click()}})},2000)";
+  c+="}else if(!clicked){";
+  c+="clicked=true;var ri=Math.floor(Math.random()*os.length);";
+  c+="p.innerText='💀 Click #'+(ri+1)+'/'+os.length;";
+  c+="setTimeout(function(){os[ri].click()},800+Math.floor(Math.random()*500))}";
+  c+="}catch(e){p.innerText='⚠️ '+e.message}}";
+  c+="setInterval(tick,1500)";
+  c+="}).catch(function(e){p.innerText='❌ Lỗi mạng!'})";
+  c+="})())";
+  return c;
 }
 
 document.getElementById('bmHarvest').href = getBMHarvest();
 document.getElementById('bmHighlight').href = getBM('highlight');
 document.getElementById('bmAuto').href = getBM('auto');
-
-function handleBtnClick(e) {
-  e.preventDefault();
-  var codeToCopy = this.getAttribute('href');
-  
-  if(navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(codeToCopy).then(() => {
-      alert("✅ ĐÃ COPY CODE THÀNH CÔNG!\n\nBạn là Điện Thoại đúng không?\n- Mở Menu trình duyệt -> Chọn 'Thêm Dấu Trang'\n- Nhấn nút Sửa Dấu Trang đó.\n- Dán đoạn code vừa copy vào ô URL (địa chỉ) rồi lưu lại là xong!");
-    });
-  } else {
-    // Fallback for tricky environments
-    var textArea = document.createElement("textarea");
-    textArea.value = codeToCopy;
-    textArea.style.position = "fixed";  // Avoid scrolling to bottom
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-      document.execCommand('copy');
-      alert("✅ ĐÃ COPY CODE THÀNH CÔNG!\n\nBạn là Điện Thoại đúng không?\n- Mở Menu trình duyệt -> Chọn 'Thêm Dấu Trang'\n- Nhấn nút Sửa Dấu Trang đó.\n- Dán đoạn code vừa copy vào ô URL (địa chỉ) rồi lưu lại là xong!");
-    } catch (err) {
-      alert("❌ COPY LỖI!\n\nVui lòng tự đè giữ nút để Copy địa chỉ liên kết nhé.");
-    }
-    document.body.removeChild(textArea);
-  }
-}
-
-document.getElementById('bmHarvest').addEventListener('click', handleBtnClick);
-document.getElementById('bmHighlight').addEventListener('click', handleBtnClick);
-document.getElementById('bmAuto').addEventListener('click', handleBtnClick);
-
 </script>
 </body>
 </html>

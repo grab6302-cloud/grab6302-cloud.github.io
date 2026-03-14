@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QSP Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="shield.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}
 body{background:#0a0a1a;color:#fff;font-family:'Inter','Segoe UI',sans-serif;padding:20px}
 h1{color:#00e676;text-align:center;margin-bottom:20px;font-size:22px}
 .tabs{display:flex;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
@@ -48,6 +49,7 @@ td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:#ccc}
   <div class="tab" onclick="showPage('users')">👥 Users</div>
   <div class="tab" onclick="showPage('keys')">🔑 Keys</div>
   <div class="tab" onclick="showPage('purchases')">📦 Giao Dịch</div>
+  <div class="tab" onclick="showPage('data')">📊 Dữ Liệu</div>
 </div>
 
 <!-- NẠP TIỀN -->
@@ -90,6 +92,22 @@ td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:#ccc}
     <div id="resetList"></div>
   </div>
 </div>
+
+<!-- DỮ LIỆU ĐÁP ÁN -->
+<div class="page" id="page-data">
+  <div class="panel">
+    <h2>📊 Dữ Liệu Đáp Án <button onclick="loadData()" style="padding:4px 10px;font-size:11px">🔄</button></h2>
+    <div id="dataStats" style="margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button onclick="cleanAnswers()">🧹 Làm sạch data</button>
+      <button class="btn-red" onclick="clearAllAnswers()">🗑️ Xóa tất cả đáp án</button>
+    </div>
+    <div style="margin-bottom:10px">
+      <input id="dataSearch" placeholder="🔍 Tìm câu hỏi..." oninput="filterAnswers()" style="max-width:400px">
+    </div>
+    <div id="dataList"></div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -124,7 +142,7 @@ async function saveBin(){
 }
 
 async function loadData(){
-  try{await getBin();renderDeposits();renderUsers();renderKeys();renderPurchases();renderResets();}catch(e){alert('Lỗi: '+e.message);}
+  try{await getBin();renderDeposits();renderUsers();renderKeys();renderPurchases();renderResets();renderData();}catch(e){alert('Lỗi: '+e.message);}
 }
 
 function renderDeposits(){
@@ -266,6 +284,64 @@ async function approveReset(idx){
   r.status='approved';r.approvedAt=Date.now();
   await saveBin();loadData();
   alert('✅ Đã đổi MK cho '+r.phone);
+}
+
+// ========== DỮ LIỆU ĐÁP ÁN ==========
+function cln(s){return s.replace(/^\d+\/\d+/,'').replace(/^[\s.]+/,'').replace(/^\+\d+\s*/,'').replace(/\d+$/,'').replace(/\s+/g,' ').trim().toLowerCase()}
+
+function renderData(){
+  var ans=DATA._answers||{};
+  var keys=Object.keys(ans);
+  document.getElementById('dataStats').innerHTML=
+    '<div class="stat">Tổng câu: <b>'+keys.length+'</b></div>';
+  var search=(document.getElementById('dataSearch')||{}).value||'';
+  var filtered=search?keys.filter(function(k){return k.indexOf(search.toLowerCase())>-1}):keys;
+  if(filtered.length===0){document.getElementById('dataList').innerHTML='<p style="color:#888">Chưa có dữ liệu</p>';return;}
+  var html='<table><tr><th style="width:50%">Câu hỏi</th><th>Đáp án</th><th></th></tr>';
+  filtered.forEach(function(k){
+    var a=ans[k];
+    var aStr=Array.isArray(a)?a.join(' | '):String(a);
+    var ek=k.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    html+='<tr><td style="font-size:11px;color:#ccc;word-break:break-word">'+k.substring(0,80)+'</td>';
+    html+='<td style="font-size:11px;color:#00e676;word-break:break-word">'+aStr.substring(0,100)+'</td>';
+    html+='<td><button class="btn-red" onclick="deleteAnswer(this)" data-key="'+ek+'" style="padding:3px 8px;font-size:10px">\u274c</button></td></tr>';
+  });
+  html+='</table>';
+  document.getElementById('dataList').innerHTML=html;
+}
+
+function filterAnswers(){renderData();}
+
+async function cleanAnswers(){
+  if(!confirm('Làm sạch data? (Xóa số đề, điểm, số đuôi)'))return;
+  var ans=DATA._answers||{};
+  var newAns={};var cleaned=0;
+  for(var k in ans){
+    var ck=cln(k);
+    var vals=ans[k];
+    if(Array.isArray(vals)){vals=vals.map(function(v){return cln(v)}).filter(function(v){return v.length>0});}
+    if(!newAns[ck])newAns[ck]=[];
+    if(Array.isArray(vals)){vals.forEach(function(v){if(newAns[ck].indexOf(v)<0)newAns[ck].push(v)});}
+    if(ck!==k)cleaned++;
+  }
+  DATA._answers=newAns;
+  await saveBin();loadData();
+  alert('Done! '+cleaned+' cleaned. Total: '+Object.keys(newAns).length);
+}
+
+async function clearAllAnswers(){
+  if(!confirm('XÓA TẤT CẢ đáp án? Keys vẫn giữ.'))return;
+  if(!confirm('Chắc chắn?'))return;
+  DATA._answers={};
+  await saveBin();loadData();
+  alert('Đã xóa toàn bộ đáp án!');
+}
+
+async function deleteAnswer(btn){
+  var key=btn.getAttribute('data-key');
+  if(!confirm('Xóa câu này?'))return;
+  delete DATA._answers[key];
+  await saveBin();renderData();
 }
 </script>
 </body>
