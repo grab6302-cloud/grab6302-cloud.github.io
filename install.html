@@ -170,12 +170,12 @@ function getBM(mode) {
               if(idx>-1) break;
             }
             if(idx>-1 && idx<os.length){
-              var dl=500+Math.floor(Math.random()*1000); log('⏱️ Chờ '+(dl/1000).toFixed(1)+'s...','#ff9800');
+              var dl=6000+Math.floor(Math.random()*4000); log('⏱️ Chờ '+(dl/1000).toFixed(1)+'s...','#ff9800');
               setTimeout(()=>{
                 os[idx].style.cssText+=';box-shadow:0 0 25px #00e676!important;border:3px solid #00e676!important;position:relative;z-index:9999;transition:.3s;';
                 log('✅ Đáp án #'+(idx+1),'#00e676');
                 if(MODE==='auto'){
-                  setTimeout(()=>{os[idx].click();log('🖱️ Đã click!','#00e676');}, 200+Math.floor(Math.random()*300));
+                  setTimeout(()=>{os[idx].click();log('🖱️ Đã click!','#00e676');}, 500+Math.floor(Math.random()*1500));
                 }
               }, dl);
             } else { log('❓ Chưa có đáp án','#ff5722'); }
@@ -187,10 +187,10 @@ function getBM(mode) {
       if(needsSync){
         log('⏳ Đang lưu dữ liệu Cloud...','#ff9800');
         fetch('https://api.jsonbin.io/v3/b/'+B_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':B_KEY},body:JSON.stringify(d)})
-        .then(function(r){ proceed(); setInterval(tick,800); })
+        .then(function(r){ proceed(); setInterval(tick,1500); })
         .catch(function(e){ log('❌ Lỗi lưu Cloud!','#f44'); });
       } else { 
-        proceed(); setInterval(tick,800); 
+        proceed(); setInterval(tick,1500); 
       }
     }).catch(e=>log('❌ Lỗi kết nối server!','#f44'));
   })();`;
