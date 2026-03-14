@@ -146,7 +146,7 @@ function getBM(mode) {
           var qE=null; qs.forEach(e=>{if(e.textContent.trim().length>10 && !qE)qE=e});
           if(!qE)return; var q=qE.textContent.trim(); if(q===_lq)return; _lq=q;
           
-          var os=document.querySelectorAll('[class*="answer"], [class*="option"], [role="button"], button[class*="btn"]');
+          var os=document.querySelectorAll('button.option, [role="option"], [class*="answer"], [class*="choice"]');
           var ot=[]; os.forEach(e=>ot.push(e.textContent.trim()));
           
           var a=null; var q_strip=q.replace(/<[^>]*>/g,'').replace(/\\s+/g,' ').trim().toLowerCase();
