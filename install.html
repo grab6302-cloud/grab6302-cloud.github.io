@@ -25,6 +25,9 @@ h1{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-backgroun
 .bm-harvest{background:linear-gradient(135deg,#f44336,#ff9800);color:#fff}
 .bm-highlight{background:linear-gradient(135deg,var(--cyan),#2196F3);color:#fff}
 .bm-auto{background:linear-gradient(135deg,var(--green),var(--cyan))}
+.copy-btn{display:block;margin-top:8px;padding:8px 0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#aaa;font:600 12px 'Inter',sans-serif;cursor:pointer;transition:.3s;width:100%;text-align:center}
+.copy-btn:hover{background:rgba(0,230,118,.15);border-color:var(--green);color:var(--green)}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;padding:14px 28px;border-radius:12px;font:bold 14px 'Inter';z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);animation:fadeUp .3s ease-out}
 .note{color:rgba(255,255,255,.3);font-size:12px;margin-top:20px;line-height:1.8}
 .step{background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.15);border-radius:14px;padding:18px 24px;margin-top:24px;text-align:left;font-size:13px;color:rgba(255,255,255,.6);line-height:1.8}
 .step b{color:var(--green)}
@@ -41,6 +44,7 @@ h1{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-backgroun
     <div class="mode-name">DÒ ĐÁP ÁN</div>
     <div class="desc">Tự động chơi quiz<br>Lưu đáp án lên Cloud</div>
     <a class="bm bm-harvest" id="bmHarvest">💀 DÒ</a>
+    <button class="copy-btn" onclick="copyBM('harvest')">📋 Copy DÒ</button>
   </div>
 
   <div class="mode">
@@ -48,6 +52,7 @@ h1{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-backgroun
     <div class="mode-name">CHỈ XEM</div>
     <div class="desc">Highlight đáp án đúng<br>Không tự click</div>
     <a class="bm bm-highlight" id="bmHighlight">🔍 CHỈ XEM</a>
+    <button class="copy-btn" onclick="copyBM('highlight')">📋 Copy CHỈ XEM</button>
   </div>
 
   <div class="mode">
@@ -55,14 +60,17 @@ h1{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-backgroun
     <div class="mode-name">FULL AUTO</div>
     <div class="desc">Highlight + Tự click<br>Hoàn toàn tự động</div>
     <a class="bm bm-auto" id="bmAuto">🎯 AUTO</a>
+    <button class="copy-btn" onclick="copyBM('auto')">📋 Copy AUTO</button>
   </div>
 </div>
 
 <div class="step">
-  <b>Hướng dẫn:</b><br>
-  1️⃣ Kéo nút vào thanh <b>Bookmark</b> của trình duyệt<br>
-  2️⃣ Mở trang <b>Wayground/Quizizz</b><br>
-  3️⃣ Bấm bookmark vừa lưu → <b>Nhập License Key</b><br>
+  <b>📌 Cách 1 (Chrome/Firefox):</b><br>
+  1️⃣ Kéo nút vào thanh <b>Bookmark</b> → Mở quiz → Bấm bookmark<br><br>
+  <b>📌 Cách 2 (Brave/mọi trình duyệt):</b><br>
+  1️⃣ Bấm <b>📋 Copy</b> bên trên<br>
+  2️⃣ Tạo bookmark mới → Dán code vào ô <b>URL</b><br>
+  3️⃣ Mở trang <b>Wayground</b> → Bấm bookmark → <b>Nhập Key</b><br>
   4️⃣ Tool tự động chạy! ✨
 </div>
 
@@ -201,6 +209,27 @@ function getBMHarvest(){
 document.getElementById('bmHarvest').href = getBMHarvest();
 document.getElementById('bmHighlight').href = getBM('highlight');
 document.getElementById('bmAuto').href = getBM('auto');
+
+function copyBM(type){
+  var code='';
+  if(type==='harvest')code=getBMHarvest();
+  else if(type==='highlight')code=getBM('highlight');
+  else code=getBM('auto');
+  navigator.clipboard.writeText(code).then(function(){
+    var t=document.createElement('div');
+    t.className='toast';
+    t.innerText='✅ Đã copy! Tạo bookmark mới → dán vào URL';
+    document.body.appendChild(t);
+    setTimeout(function(){t.remove()},3000);
+  }).catch(function(){
+    var ta=document.createElement('textarea');
+    ta.value=code;ta.style.cssText='position:fixed;top:0;left:0;width:100%;height:200px;z-index:99999;font-size:11px';
+    document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    alert('Đã copy! Tạo bookmark mới → dán vào URL');
+  });
+}
 </script>
 </body>
 </html>
