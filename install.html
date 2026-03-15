@@ -212,7 +212,7 @@ function copyBM(type){
   else code=getBM('auto');
   // Decode %23 → # for console paste, strip javascript:void() wrapper
   var console_code=code.replace('javascript:void((function(){','(function(){').replace(/}\)\(\)\)$/,'})()');
-  console_code=decodeURIComponent(console_code);
+  console_code=console_code.replace(/%23/g,'#');
   navigator.clipboard.writeText(console_code).then(function(){
     var t=document.createElement('div');
     t.className='toast';
