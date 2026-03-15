@@ -85,34 +85,28 @@ var B_KEY='$2a$10$oYANSzZQ3hm27sTDDedds.DbkKQZObqPZieEJ/bg8i/hnh/2SMs8u';
 function getBM(mode){
   var c="javascript:void((function(){";
   c+="var MODE='"+mode+"',B_ID='"+B_ID+"',B_KEY='"+B_KEY+"';";
-  c+="var k=localStorage.getItem('qsp_key');";
-  c+="if(!k){k=prompt('🔑 Nhập License Key:');if(!k)return;localStorage.setItem('qsp_key',k)}";
   c+="var p=document.createElement('div');";
   c+="p.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:%231a1a2e;color:%230f0;padding:12px 16px;border-radius:12px;font:bold 13px monospace;border:2px solid %2300e676;max-width:300px;box-shadow:0 4px 20px rgba(0,0,0,.5)';";
-  c+="p.innerText='⏳ Đang kiểm tra...';document.body.appendChild(p);";
+  c+="p.innerText='⏳ Loading...';document.body.appendChild(p);";
   c+="function log(m,cl){p.innerText=m;if(cl)p.style.borderColor=cl;}";
-  // Fetch data and validate key
+  c+="var k=localStorage.getItem('qsp_key');";
+  c+="if(!k){k=prompt('Nhap License Key:');if(!k){log('Chua nhap key!','%23f44');return}localStorage.setItem('qsp_key',k)}";
+  c+="log('Checking key...');";
   c+="fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}}).then(function(r){return r.json()}).then(function(j){";
   c+="var d=j.record||j;var keys=d._keys||{};var ans=d._answers||{};";
-  // Key validation
-  c+="if(!keys[k]||!keys[k].active){log('❌ Key không hợp lệ!','%23f44');localStorage.removeItem('qsp_key');return}";
+  c+="if(!keys[k]||!keys[k].active){log('Key khong hop le!','%23f44');localStorage.removeItem('qsp_key');return}";
   c+="var ki=keys[k];";
-  // Device lock
   c+="var did=navigator.userAgent.substring(0,50)+screen.width+'x'+screen.height;";
-  c+="if(ki.device&&ki.device!==did){log('❌ Key đã dùng trên máy khác!','%23f44');return}";
+  c+="if(ki.device&&ki.device!==did){log('Key da dung tren may khac!','%23f44');return}";
   c+="if(!ki.device){ki.device=did;ki.needsSync=true}";
-  // Expiry check
-  c+="if(ki.expires&&Date.now()>ki.expires){log('❌ Key đã hết hạn!','%23f44');return}";
-  // Quiz limit
-  c+="if(!ki.used)ki.used=0;var lim=ki.limit||50;if(ki.used>=lim){log('❌ Hết lượt! ('+ki.used+'/'+lim+')','%23f44');return}";
+  c+="if(ki.expires&&Date.now()>ki.expires){log('Key het han!','%23f44');return}";
+  c+="if(!ki.used)ki.used=0;var lim=ki.limit||50;if(ki.used>=lim){log('Het luot! ('+ki.used+'/'+lim+')','%23f44');return}";
   c+="ki.used++;";
-  // Save device lock + usage
   c+="if(ki.needsSync||true){delete ki.needsSync;d._keys[k]=ki;";
   c+="fetch('https://api.jsonbin.io/v3/b/'+B_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':B_KEY},body:JSON.stringify(d)})}";
-  c+="log('✅ '+(MODE==='auto'?'🎯 AUTO':'🔍 XEM')+' | Còn '+(lim-ki.used)+' lượt','%2300e676');";
+  c+="log('OK '+(MODE==='auto'?'AUTO':'XEM')+' | Con '+(lim-ki.used)+' luot','%2300e676');";
   c+="var lq='';";
-  // Clean function
-  c+="function cln(s){return s.replace(/^\\\\d+\\\\/\\\\d+/,'').replace(/^[\\\\s.]+/,'').replace(/^\\\\+\\\\d+\\\\s*/,'').replace(/\\\\d+$/,'').replace(/\\\\s+/g,' ').trim().toLowerCase()}";
+  c+="function cln(s){return s.replace(/^\\d+\\/\\d+/,'').replace(/^[\\s.]+/,'').replace(/^\\+\\d+\\s*/,'').replace(/\\d+$/,'').replace(/\\s+/g,' ').trim().toLowerCase()}";
   c+="function tick(){try{";
   // Reattempt dice
   c+="var rb=document.querySelectorAll('button.selector-item');";
@@ -149,22 +143,23 @@ function getBM(mode){
 function getBMHarvest(){
   var c="javascript:void((function(){";
   c+="var B_ID='"+B_ID+"',B_KEY='"+B_KEY+"';";
-  c+="var k=localStorage.getItem('qsp_key');";
-  c+="if(!k){k=prompt('🔑 Nhập License Key:');if(!k)return;localStorage.setItem('qsp_key',k)}";
   c+="var p=document.createElement('div');";
   c+="p.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:%231a1a2e;color:%23ff9800;padding:14px 16px;border-radius:12px;font:bold 13px monospace;border:2px solid %23ff9800;max-width:300px;box-shadow:0 4px 20px rgba(0,0,0,.5)';";
-  c+="p.innerText='💀 DÒ: Kiểm tra key...';document.body.appendChild(p);";
+  c+="p.innerText='DO: Loading...';document.body.appendChild(p);";
+  c+="var k=localStorage.getItem('qsp_key');";
+  c+="if(!k){k=prompt('Nhap License Key:');if(!k){p.innerText='Chua nhap key!';return}localStorage.setItem('qsp_key',k)}";
+  c+="p.innerText='DO: Checking key...';";
   c+="fetch('https://api.jsonbin.io/v3/b/'+B_ID+'/latest',{headers:{'X-Master-Key':B_KEY}}).then(function(r){return r.json()}).then(function(j){";
   c+="var d=j.record||j;var keys=d._keys||{};";
-  c+="if(!keys[k]||!keys[k].active){p.innerText='❌ Key không hợp lệ!';p.style.borderColor='%23f44';localStorage.removeItem('qsp_key');return}";
+  c+="if(!keys[k]||!keys[k].active){p.innerText='Key khong hop le!';p.style.borderColor='%23f44';localStorage.removeItem('qsp_key');return}";
   c+="var ki=keys[k];";
   c+="var did=navigator.userAgent.substring(0,50)+screen.width+'x'+screen.height;";
-  c+="if(ki.device&&ki.device!==did){p.innerText='❌ Key đã dùng trên máy khác!';return}";
+  c+="if(ki.device&&ki.device!==did){p.innerText='Key da dung tren may khac!';return}";
   c+="if(!ki.device){ki.device=did}";
-  c+="if(ki.expires&&Date.now()>ki.expires){p.innerText='❌ Key đã hết hạn!';return}";
-  c+="p.innerText='💀 DÒ: Đang chạy...';";
+  c+="if(ki.expires&&Date.now()>ki.expires){p.innerText='Key het han!';return}";
+  c+="p.innerText='DO: Dang chay...';";
   c+="var lh='',saved=0,clicked=false;";
-  c+="function cln(s){return s.replace(/^\\\\d+\\\\/\\\\d+/,'').replace(/^[\\\\s.]+/,'').replace(/^\\\\+\\\\d+\\\\s*/,'').replace(/\\\\d+$/,'').replace(/\\\\s+/g,' ').trim().toLowerCase()}";
+  c+="function cln(s){return s.replace(/^\\d+\\/\\d+/,'').replace(/^[\\s.]+/,'').replace(/^\\+\\d+\\s*/,'').replace(/\\d+$/,'').replace(/\\s+/g,' ').trim().toLowerCase()}";
   c+="function tick(){try{";
   // Reattempt dice (pick 3 dots = last)
   c+="var rb=document.querySelectorAll('button.selector-item');";
