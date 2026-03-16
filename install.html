@@ -177,7 +177,7 @@ function getBMHarvest(){
   c+="if(os.length<2)return;";
   c+="if(q!==lh){lh=q;clicked=false}";
   // Correct answer detection
-  c+="var cs=document.querySelectorAll('[class*=correct],[class*=Correct],[data-correct=true],[aria-label*=correct],[class*=is-correct]');";
+  c+="var cs=document.querySelectorAll('[class*=\"correct\" i]:not([class*=\"incorrect\" i]),[data-correct=\"true\" i],[aria-label*=\"correct\" i]:not([aria-label*=\"incorrect\" i])');";
   c+="if(cs.length>0){";
   c+="var as=[];cs.forEach(function(e){var t=cln(e.textContent.trim());if(t.length>0)as.push(t)});";
   c+="var sq=cln(q.replace(/<[^>]*>/g,''));";
