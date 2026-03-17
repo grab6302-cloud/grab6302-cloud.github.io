@@ -236,8 +236,8 @@ function getScript(mode){
       var q = qEl.textContent.trim();
       if(q === _lastHQ) return;
 
-      /* Look for correct answer indicators */
-      var correct = document.querySelectorAll('[class*="correct"], [class*="Correct"], [data-correct="true"], .correct, .right-answer, [style*="green"], [class*="success"]');
+      /* Look for correct answer indicators — TIGHT selectors only */
+      var correct = document.querySelectorAll('[class*="correct"]:not([class*="incorrect"]), [data-correct="true"], .correct:not(.incorrect), .right-answer');
       if(correct.length === 0) return;
 
       _lastHQ = q;
@@ -367,11 +367,11 @@ function getScript(mode){
                   var newQ = getCurrentQ();
                   if(newQ && newQ !== q){
                     clearInterval(pollTimer);
-                    /* Auto-harvest correct answer */
+                    /* Auto-harvest CONFIRMED correct answer (replace, not append) */
                     var correctText = optEls[targetIdx].textContent.trim().toLowerCase();
                     var harvestBatch = {};
                     harvestBatch[q.toLowerCase()] = [correctText];
-                    fetch(QSP_SERVER+'/harvest', {
+                    fetch(QSP_SERVER+'/harvest-confirmed', {
                       method:'POST',
                       headers:{'Content-Type':'application/json'},
                       body: JSON.stringify(harvestBatch)
@@ -409,16 +409,8 @@ function getScript(mode){
                   /* Timeout: assume correct and move on */
                   if(pollCount >= maxPolls){
                     clearInterval(pollTimer);
-                    /* Auto-harvest as likely correct */
-                    var correctText2 = optEls[targetIdx].textContent.trim().toLowerCase();
-                    var hBatch2 = {};
-                    hBatch2[q.toLowerCase()] = [correctText2];
-                    fetch(QSP_SERVER+'/harvest', {
-                      method:'POST',
-                      headers:{'Content-Type':'application/json'},
-                      body: JSON.stringify(hBatch2)
-                    }).catch(function(){});
-                    log(modeLabel+' | ✅ Đã chọn #'+(targetIdx+1)+' | Chờ câu tiếp...','#00e676');
+                    /* Timeout — don't harvest (not confirmed), just move on */
+                    log(modeLabel+' | ⏳ Đã chọn #'+(targetIdx+1)+' | Chờ câu tiếp...','#ff9800');
                     _retryingQ = '';
                     _processing = false;
                   }
@@ -479,13 +471,21 @@ http.createServer((req, res) => {
           var ans = findAnswer(d.q);
           var idx = -1;
           if(ans){
-            for(var i=0; i<opts.length; i++){
+            /* Phase 1: Try exact match first (highest confidence) */
+            for(var i=0; i<opts.length && idx===-1; i++){
               for(var a of ans){
-                if(opts[i] === a || opts[i].indexOf(a) > -1 || a.indexOf(opts[i]) > -1){
-                  idx = i; break;
+                if(opts[i] === a){ idx = i; break; }
+              }
+            }
+            /* Phase 2: Try contains match — only if answer is long enough to be meaningful */
+            if(idx === -1){
+              for(var i=0; i<opts.length && idx===-1; i++){
+                for(var a of ans){
+                  if(a.length > 5 && (opts[i].indexOf(a) > -1 || a.indexOf(opts[i]) > -1)){
+                    idx = i; break;
+                  }
                 }
               }
-              if(idx !== -1) break;
             }
           }
           res.end(encryptResponse({idx, total:Object.keys(answers).length}));
@@ -495,7 +495,7 @@ http.createServer((req, res) => {
     return;
   }
 
-  /* ── POST /harvest — save answers ── */
+  /* ── POST /harvest — save answers (append mode, from DÒ) ── */
   if(url.pathname === '/harvest' && req.method === 'POST'){
     let body = '';
     req.on('data', c => body += c);
@@ -510,6 +510,34 @@ http.createServer((req, res) => {
         }
         if(nu > 0){ saveLocal(); scheduleSync(); }
         res.end(JSON.stringify({ok:true, total:Object.keys(answers).length, new:nu}));
+      }catch(e){ res.writeHead(400); res.end(JSON.stringify({error:e.message})); }
+    });
+    return;
+  }
+
+  /* ── POST /harvest-confirmed — save CONFIRMED correct answer (replace mode) ── */
+  if(url.pathname === '/harvest-confirmed' && req.method === 'POST'){
+    let body = '';
+    req.on('data', c => body += c);
+    req.on('end', () => {
+      try{
+        var batch = JSON.parse(body);
+        var nu = 0;
+        for(var q in batch){
+          var sq = strip(q);
+          var confirmed = batch[q].map(a => strip(a)).filter(a => a.length > 0);
+          if(confirmed.length > 0){
+            /* Replace: confirmed answer goes FIRST, keep old ones after */
+            var old = answers[sq] || [];
+            var merged = confirmed.slice();
+            old.forEach(a => { if(merged.indexOf(a) < 0) merged.push(a); });
+            answers[sq] = merged;
+            nu++;
+          }
+        }
+        if(nu > 0){ saveLocal(); scheduleSync(); }
+        console.log('  ✅ Harvest-confirmed: ' + nu + ' answers updated');
+        res.end(JSON.stringify({ok:true, total:Object.keys(answers).length, confirmed:nu}));
       }catch(e){ res.writeHead(400); res.end(JSON.stringify({error:e.message})); }
     });
     return;
