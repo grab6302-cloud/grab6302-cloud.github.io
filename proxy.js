@@ -202,16 +202,55 @@ function getScript(mode){
   }).catch(function(){ log('❌ Server offline! Chạy proxy.js','#f44'); });
 
   var _lastQ = '', _lastHQ = '', _processing = false, _hCount = 0;
+  /* Track wrong answers per question to exclude on retry */
+  var _wrongIdxMap = {};  /* { questionText: [idx0, idx1, ...] } */
+  var _retryingQ = '';    /* question currently being retried */
 
   function startEngine(){
     var obs = new MutationObserver(function(){ engineTick(); });
     obs.observe(document.body, {childList:true, subtree:true, characterData:true});
     setInterval(engineTick, 1500);
+    /* Also watch for wrong-answer feedback to trigger retry */
+    setInterval(checkWrongAnswer, 800);
   }
 
   function engineTick(){
     tryHarvest();
     if(QSP_MODE !== 'harvest') tryPlay();
+  }
+
+  /* ── Detect wrong answer feedback on page ── */
+  function checkWrongAnswer(){
+    if(!_retryingQ && !_processing) return;
+    try {
+      var wrongEls = document.querySelectorAll(
+        '[class*="incorrect"], [class*="Incorrect"], [class*="wrong"], [class*="Wrong"], ' +
+        '[class*="error"], [data-correct="false"], .incorrect, .wrong, ' +
+        '[style*="border-color: red"], [style*="border-color:red"], ' +
+        '[style*="background-color: red"], [style*="background-color:red"], ' +
+        '[style*="background: red"], [style*="background:red"], ' +
+        '[class*="fail"], [class*="missed"]'
+      );
+      /* Also detect red background/border via computed style */
+      if(wrongEls.length === 0){
+        var allOpts = document.querySelectorAll('[class*="answer"], [class*="Answer"], [class*="option"], [class*="Option"], [class*="choice"], [data-testid*="answer"], button[class*="btn"]');
+        if(allOpts.length < 2) allOpts = document.querySelectorAll('.option, .answer, [role="button"]');
+        allOpts.forEach(function(el){
+          var cs = window.getComputedStyle(el);
+          var bg = cs.backgroundColor || '';
+          var bc = cs.borderColor || '';
+          /* Check for red-ish colors */
+          if((bg.indexOf('rgb(255') > -1 && bg.indexOf(', 0)') > -1) || 
+             (bc.indexOf('rgb(255') > -1 && bc.indexOf(', 0)') > -1) ||
+             el.getAttribute('aria-invalid') === 'true'){
+            wrongEls = document.querySelectorAll('.__qsp_force_match__'); /* dummy to make length > 0 trick */
+            /* Mark this element */
+            el.setAttribute('data-qsp-wrong', 'true');
+          }
+        });
+        wrongEls = document.querySelectorAll('[data-qsp-wrong="true"]');
+      }
+    } catch(e){}
   }
 
   function tryHarvest(){
@@ -248,7 +287,26 @@ function getScript(mode){
     } catch(e){}
   }
 
-  /* ── PLAY (highlight / auto) ── */
+  /* ── Check if an option element is marked wrong ── */
+  function isOptionWrong(el){
+    var cls = (el.className || '').toLowerCase();
+    if(cls.indexOf('incorrect') > -1 || cls.indexOf('wrong') > -1 || cls.indexOf('error') > -1 || cls.indexOf('fail') > -1 || cls.indexOf('missed') > -1) return true;
+    if(el.getAttribute('data-correct') === 'false') return true;
+    if(el.getAttribute('aria-invalid') === 'true') return true;
+    if(el.getAttribute('data-qsp-wrong') === 'true') return true;
+    var style = el.getAttribute('style') || '';
+    if(style.indexOf('red') > -1) return true;
+    try {
+      var cs = window.getComputedStyle(el);
+      var bg = cs.backgroundColor || '';
+      /* Red-ish: rgb(255, 0, 0) or similar */
+      var m = bg.match(/rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)/);
+      if(m && parseInt(m[1]) > 200 && parseInt(m[2]) < 80 && parseInt(m[3]) < 80) return true;
+    } catch(e){}
+    return false;
+  }
+
+  /* ── PLAY (highlight / auto) with RETRY on wrong answer ── */
   function tryPlay(){
     if(_processing) return;
     try {
@@ -259,8 +317,23 @@ function getScript(mode){
       if(!qEl) return;
 
       var q = qEl.textContent.trim();
-      if(q === _lastQ) return;
-      _lastQ = q;
+
+      /* If this is a NEW question (different from last), reset wrong history */
+      if(q !== _lastQ && q !== _retryingQ){
+        _lastQ = q;
+        _retryingQ = '';
+        _wrongIdxMap[q] = [];
+      }
+
+      /* If we are retrying this question, check if any option is now wrong */
+      if(_retryingQ === q){
+        /* Already handled – proceed to pick next option */
+      } else if(q === _lastQ && !_retryingQ){
+        /* First attempt for this question */
+      } else {
+        return; /* Same question already processed, not retrying */
+      }
+
       _processing = true;
 
       /* Find answer options */
@@ -271,8 +344,22 @@ function getScript(mode){
       var opts = [];
       optEls.forEach(function(el){ opts.push(el.textContent.trim()); });
 
+      /* Build list of wrong indices by checking DOM state */
+      if(!_wrongIdxMap[q]) _wrongIdxMap[q] = [];
+      for(var wi = 0; wi < optEls.length; wi++){
+        if(isOptionWrong(optEls[wi]) && _wrongIdxMap[q].indexOf(wi) < 0){
+          _wrongIdxMap[q].push(wi);
+        }
+      }
+
+      var wrongList = _wrongIdxMap[q] || [];
       var modeLabel = QSP_MODE === 'auto' ? '🎯 AUTO' : '🔍 CHỈ XEM';
-      log(modeLabel+' | 🔍 Đang tìm đáp án...','#00bcd4');
+
+      if(_retryingQ === q){
+        log(modeLabel+' | 🔄 Sai rồi! Đang chọn lại... (loại '+wrongList.length+' đáp án sai)','#ff5722');
+      } else {
+        log(modeLabel+' | 🔍 Đang tìm đáp án...','#00bcd4');
+      }
 
       /* Ask server */
       fetch(QSP_SERVER+'/ask', {
@@ -282,31 +369,99 @@ function getScript(mode){
       }).then(r=>r.json()).then(function(raw){
         var d = decrypt(raw);
         if(!d){ log(modeLabel+' | ❌ Lỗi giải mã','#f44'); _processing=false; return; }
-        if(d.idx >= 0 && d.idx < optEls.length){
-          /* Random delay 6-10 seconds */
-          var delay = 6000 + Math.floor(Math.random() * 4000);
+        
+        var targetIdx = d.idx;
+        
+        /* If server's answer is in wrong list, pick the next available option */
+        if(targetIdx >= 0 && wrongList.indexOf(targetIdx) > -1){
+          targetIdx = -1; /* Server answer was already wrong, find another */
+        }
+        
+        /* If no good answer from server, try remaining options */
+        if(targetIdx < 0 || targetIdx >= optEls.length){
+          for(var ci = 0; ci < optEls.length; ci++){
+            if(wrongList.indexOf(ci) < 0 && !isOptionWrong(optEls[ci])){
+              targetIdx = ci;
+              break;
+            }
+          }
+        }
+
+        if(targetIdx >= 0 && targetIdx < optEls.length){
+          /* Shorter delay on retry (2-4s), normal delay on first try (6-10s) */
+          var isRetry = _retryingQ === q;
+          var delay = isRetry ? (2000 + Math.floor(Math.random() * 2000)) : (6000 + Math.floor(Math.random() * 4000));
           var sec = (delay/1000).toFixed(1);
-          log(modeLabel+' | ⏱️ Chờ '+sec+'s...','#ff9800');
+          log(modeLabel+' | ⏱️ '+(isRetry?'Chọn lại sau ':'Chờ ')+sec+'s...', isRetry ? '#ff9800' : '#ff9800');
 
           setTimeout(function(){
-            /* Highlight */
-            optEls[d.idx].style.cssText += ';box-shadow:0 0 25px #00e676,0 0 50px rgba(0,230,118,.3)!important;border:3px solid #00e676!important;position:relative;z-index:9999;transition:.3s';
-            log(modeLabel+' | ✅ Đáp án #'+(d.idx+1)+' | DB:'+d.total,'#00e676');
+            /* Highlight the chosen answer */
+            optEls[targetIdx].style.cssText += ';box-shadow:0 0 25px #00e676,0 0 50px rgba(0,230,118,.3)!important;border:3px solid #00e676!important;position:relative;z-index:9999;transition:.3s';
+            log(modeLabel+' | '+(isRetry?'🔄':'✅')+' Đáp án #'+(targetIdx+1)+' | DB:'+d.total, isRetry?'#ff9800':'#00e676');
 
             if(QSP_MODE === 'auto'){
               /* Auto click after small extra delay */
               var clickDelay = 500 + Math.floor(Math.random() * 1500);
               setTimeout(function(){
-                optEls[d.idx].click();
-                log(modeLabel+' | 🖱️ Đã click! Chờ câu tiếp...','#00e676');
-                _processing = false;
+                optEls[targetIdx].click();
+                log(modeLabel+' | 🖱️ Đã click #'+(targetIdx+1)+'! Đang kiểm tra...','#00bcd4');
+                
+                /* After clicking, wait and check if the answer was wrong */
+                setTimeout(function(){
+                  var wasWrong = false;
+                  /* Re-check the clicked option for wrong indicators */
+                  if(isOptionWrong(optEls[targetIdx])){
+                    wasWrong = true;
+                  }
+                  /* Also check for any general wrong feedback on page */
+                  var wrongFeedback = document.querySelectorAll(
+                    '[class*="incorrect"], [class*="wrong"], [class*="Wrong"], .incorrect, .wrong, [class*="fail"]'
+                  );
+                  if(wrongFeedback.length > 0) wasWrong = true;
+
+                  if(wasWrong){
+                    /* Mark this index as wrong */
+                    if(_wrongIdxMap[q].indexOf(targetIdx) < 0) _wrongIdxMap[q].push(targetIdx);
+                    
+                    /* Check if all options exhausted */
+                    if(_wrongIdxMap[q].length >= optEls.length){
+                      log(modeLabel+' | ❌ Hết đáp án! Tất cả đều sai.','#f44');
+                      _retryingQ = '';
+                      _processing = false;
+                      return;
+                    }
+                    
+                    /* Set retry mode – keep same question, try next option */
+                    _retryingQ = q;
+                    _lastQ = q;
+                    log(modeLabel+' | ❌ Sai! Sẽ chọn lại... ('+_wrongIdxMap[q].length+'/'+optEls.length+')','#f44');
+                    _processing = false;
+                    /* Engine will re-trigger tryPlay on next tick for same question */
+                  } else {
+                    /* Answer was correct! Auto-harvest to DB */
+                    var correctText = optEls[targetIdx].textContent.trim().toLowerCase();
+                    var harvestBatch = {};
+                    harvestBatch[q.toLowerCase()] = [correctText];
+                    fetch(QSP_SERVER+'/harvest', {
+                      method:'POST',
+                      headers:{'Content-Type':'application/json'},
+                      body: JSON.stringify(harvestBatch)
+                    }).then(r=>r.json()).then(function(hd){
+                      log(modeLabel+' | ✅ Đúng! Đã ghi DB ('+hd.total+') | Chờ câu tiếp...','#00e676');
+                    }).catch(function(){
+                      log(modeLabel+' | ✅ Đúng rồi! Chờ câu tiếp...','#00e676');
+                    });
+                    _retryingQ = '';
+                    _processing = false;
+                  }
+                }, 1500); /* Wait 1.5s for wrong/correct feedback to appear */
               }, clickDelay);
             } else {
               _processing = false;
             }
           }, delay);
         } else {
-          log(modeLabel+' | ❓ Chưa có đáp án | DB:'+d.total,'#ff5722');
+          log(modeLabel+' | ❓ Chưa có đáp án'+(wrongList.length>0?' (loại '+wrongList.length+' sai)':'') +' | DB:'+d.total,'#ff5722');
           _processing = false;
         }
       }).catch(function(){ log(modeLabel+' | ⚠️ Lỗi kết nối','#f44'); _processing = false; });
