@@ -209,9 +209,7 @@ function getScript(mode){
   function startEngine(){
     var obs = new MutationObserver(function(){ engineTick(); });
     obs.observe(document.body, {childList:true, subtree:true, characterData:true});
-    setInterval(engineTick, 1500);
-    /* Also watch for wrong-answer feedback to trigger retry */
-    setInterval(checkWrongAnswer, 800);
+    setInterval(engineTick, 2000);
   }
 
   function engineTick(){
@@ -219,38 +217,12 @@ function getScript(mode){
     if(QSP_MODE !== 'harvest') tryPlay();
   }
 
-  /* ── Detect wrong answer feedback on page ── */
-  function checkWrongAnswer(){
-    if(!_retryingQ && !_processing) return;
-    try {
-      var wrongEls = document.querySelectorAll(
-        '[class*="incorrect"], [class*="Incorrect"], [class*="wrong"], [class*="Wrong"], ' +
-        '[class*="error"], [data-correct="false"], .incorrect, .wrong, ' +
-        '[style*="border-color: red"], [style*="border-color:red"], ' +
-        '[style*="background-color: red"], [style*="background-color:red"], ' +
-        '[style*="background: red"], [style*="background:red"], ' +
-        '[class*="fail"], [class*="missed"]'
-      );
-      /* Also detect red background/border via computed style */
-      if(wrongEls.length === 0){
-        var allOpts = document.querySelectorAll('[class*="answer"], [class*="Answer"], [class*="option"], [class*="Option"], [class*="choice"], [data-testid*="answer"], button[class*="btn"]');
-        if(allOpts.length < 2) allOpts = document.querySelectorAll('.option, .answer, [role="button"]');
-        allOpts.forEach(function(el){
-          var cs = window.getComputedStyle(el);
-          var bg = cs.backgroundColor || '';
-          var bc = cs.borderColor || '';
-          /* Check for red-ish colors */
-          if((bg.indexOf('rgb(255') > -1 && bg.indexOf(', 0)') > -1) || 
-             (bc.indexOf('rgb(255') > -1 && bc.indexOf(', 0)') > -1) ||
-             el.getAttribute('aria-invalid') === 'true'){
-            wrongEls = document.querySelectorAll('.__qsp_force_match__'); /* dummy to make length > 0 trick */
-            /* Mark this element */
-            el.setAttribute('data-qsp-wrong', 'true');
-          }
-        });
-        wrongEls = document.querySelectorAll('[data-qsp-wrong="true"]');
-      }
-    } catch(e){}
+  /* ── Get current question text from page ── */
+  function getCurrentQ(){
+    var qEls = document.querySelectorAll('[class*="question"], [class*="Question"], [data-testid*="question"], h1, h2, h3, .question-text, .prompt');
+    var qEl = null;
+    qEls.forEach(function(el){ if(el.textContent.trim().length > 10 && !qEl) qEl = el; });
+    return qEl ? qEl.textContent.trim() : '';
   }
 
   function tryHarvest(){
@@ -287,22 +259,19 @@ function getScript(mode){
     } catch(e){}
   }
 
-  /* ── Check if an option element is marked wrong ── */
-  function isOptionWrong(el){
-    var cls = (el.className || '').toLowerCase();
-    if(cls.indexOf('incorrect') > -1 || cls.indexOf('wrong') > -1 || cls.indexOf('error') > -1 || cls.indexOf('fail') > -1 || cls.indexOf('missed') > -1) return true;
+  /* ── Check if a SPECIFIC element was marked wrong (only that element, not page) ── */
+  function isElementWrong(el){
+    if(!el) return false;
+    var cls = (el.className || '').toString().toLowerCase();
+    if(cls.indexOf('incorrect') > -1 || cls.indexOf('wrong') > -1) return true;
     if(el.getAttribute('data-correct') === 'false') return true;
-    if(el.getAttribute('aria-invalid') === 'true') return true;
-    if(el.getAttribute('data-qsp-wrong') === 'true') return true;
-    var style = el.getAttribute('style') || '';
-    if(style.indexOf('red') > -1) return true;
-    try {
-      var cs = window.getComputedStyle(el);
-      var bg = cs.backgroundColor || '';
-      /* Red-ish: rgb(255, 0, 0) or similar */
-      var m = bg.match(/rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)/);
-      if(m && parseInt(m[1]) > 200 && parseInt(m[2]) < 80 && parseInt(m[3]) < 80) return true;
-    } catch(e){}
+    /* Check parent too (some quiz wrap answer in a container that gets the class) */
+    var parent = el.parentElement;
+    if(parent){
+      var pcls = (parent.className || '').toString().toLowerCase();
+      if(pcls.indexOf('incorrect') > -1 || pcls.indexOf('wrong') > -1) return true;
+      if(parent.getAttribute('data-correct') === 'false') return true;
+    }
     return false;
   }
 
@@ -310,28 +279,19 @@ function getScript(mode){
   function tryPlay(){
     if(_processing) return;
     try {
-      /* Find question */
-      var qEls = document.querySelectorAll('[class*="question"], [class*="Question"], [data-testid*="question"], h1, h2, h3, .question-text, .prompt');
-      var qEl = null;
-      qEls.forEach(function(el){ if(el.textContent.trim().length > 10 && !qEl) qEl = el; });
-      if(!qEl) return;
+      var q = getCurrentQ();
+      if(!q) return;
 
-      var q = qEl.textContent.trim();
-
-      /* If this is a NEW question (different from last), reset wrong history */
+      /* New question detected → reset everything */
       if(q !== _lastQ && q !== _retryingQ){
         _lastQ = q;
         _retryingQ = '';
         _wrongIdxMap[q] = [];
       }
 
-      /* If we are retrying this question, check if any option is now wrong */
-      if(_retryingQ === q){
-        /* Already handled – proceed to pick next option */
-      } else if(q === _lastQ && !_retryingQ){
-        /* First attempt for this question */
-      } else {
-        return; /* Same question already processed, not retrying */
+      /* Skip if same question already done and NOT retrying */
+      if(q === _lastQ && !_retryingQ && _wrongIdxMap[q] === undefined){
+        return;
       }
 
       _processing = true;
@@ -344,19 +304,12 @@ function getScript(mode){
       var opts = [];
       optEls.forEach(function(el){ opts.push(el.textContent.trim()); });
 
-      /* Build list of wrong indices by checking DOM state */
       if(!_wrongIdxMap[q]) _wrongIdxMap[q] = [];
-      for(var wi = 0; wi < optEls.length; wi++){
-        if(isOptionWrong(optEls[wi]) && _wrongIdxMap[q].indexOf(wi) < 0){
-          _wrongIdxMap[q].push(wi);
-        }
-      }
-
-      var wrongList = _wrongIdxMap[q] || [];
+      var wrongList = _wrongIdxMap[q];
       var modeLabel = QSP_MODE === 'auto' ? '🎯 AUTO' : '🔍 CHỈ XEM';
 
       if(_retryingQ === q){
-        log(modeLabel+' | 🔄 Sai rồi! Đang chọn lại... (loại '+wrongList.length+' đáp án sai)','#ff5722');
+        log(modeLabel+' | 🔄 Sai rồi! Chọn lại... (loại '+wrongList.length+')','#ff5722');
       } else {
         log(modeLabel+' | 🔍 Đang tìm đáp án...','#00bcd4');
       }
@@ -372,15 +325,15 @@ function getScript(mode){
         
         var targetIdx = d.idx;
         
-        /* If server's answer is in wrong list, pick the next available option */
+        /* If server answer is in wrong list, skip it */
         if(targetIdx >= 0 && wrongList.indexOf(targetIdx) > -1){
-          targetIdx = -1; /* Server answer was already wrong, find another */
+          targetIdx = -1;
         }
         
-        /* If no good answer from server, try remaining options */
+        /* If no good answer, pick first remaining option not in wrongList */
         if(targetIdx < 0 || targetIdx >= optEls.length){
           for(var ci = 0; ci < optEls.length; ci++){
-            if(wrongList.indexOf(ci) < 0 && !isOptionWrong(optEls[ci])){
+            if(wrongList.indexOf(ci) < 0){
               targetIdx = ci;
               break;
             }
@@ -388,57 +341,33 @@ function getScript(mode){
         }
 
         if(targetIdx >= 0 && targetIdx < optEls.length){
-          /* Shorter delay on retry (2-4s), normal delay on first try (6-10s) */
           var isRetry = _retryingQ === q;
-          var delay = isRetry ? (2000 + Math.floor(Math.random() * 2000)) : (6000 + Math.floor(Math.random() * 4000));
+          var delay = isRetry ? (1500 + Math.floor(Math.random() * 1500)) : (6000 + Math.floor(Math.random() * 4000));
           var sec = (delay/1000).toFixed(1);
-          log(modeLabel+' | ⏱️ '+(isRetry?'Chọn lại sau ':'Chờ ')+sec+'s...', isRetry ? '#ff9800' : '#ff9800');
+          log(modeLabel+' | ⏱️ '+(isRetry?'Chọn lại ':'Chờ ')+sec+'s...','#ff9800');
 
           setTimeout(function(){
-            /* Highlight the chosen answer */
+            /* Highlight */
             optEls[targetIdx].style.cssText += ';box-shadow:0 0 25px #00e676,0 0 50px rgba(0,230,118,.3)!important;border:3px solid #00e676!important;position:relative;z-index:9999;transition:.3s';
             log(modeLabel+' | '+(isRetry?'🔄':'✅')+' Đáp án #'+(targetIdx+1)+' | DB:'+d.total, isRetry?'#ff9800':'#00e676');
 
             if(QSP_MODE === 'auto'){
-              /* Auto click after small extra delay */
               var clickDelay = 500 + Math.floor(Math.random() * 1500);
               setTimeout(function(){
                 optEls[targetIdx].click();
-                log(modeLabel+' | 🖱️ Đã click #'+(targetIdx+1)+'! Đang kiểm tra...','#00bcd4');
+                log(modeLabel+' | 🖱️ Đã click #'+(targetIdx+1)+'! Kiểm tra...','#00bcd4');
                 
-                /* After clicking, wait and check if the answer was wrong */
-                setTimeout(function(){
-                  var wasWrong = false;
-                  /* Re-check the clicked option for wrong indicators */
-                  if(isOptionWrong(optEls[targetIdx])){
-                    wasWrong = true;
-                  }
-                  /* Also check for any general wrong feedback on page */
-                  var wrongFeedback = document.querySelectorAll(
-                    '[class*="incorrect"], [class*="wrong"], [class*="Wrong"], .incorrect, .wrong, [class*="fail"]'
-                  );
-                  if(wrongFeedback.length > 0) wasWrong = true;
-
-                  if(wasWrong){
-                    /* Mark this index as wrong */
-                    if(_wrongIdxMap[q].indexOf(targetIdx) < 0) _wrongIdxMap[q].push(targetIdx);
-                    
-                    /* Check if all options exhausted */
-                    if(_wrongIdxMap[q].length >= optEls.length){
-                      log(modeLabel+' | ❌ Hết đáp án! Tất cả đều sai.','#f44');
-                      _retryingQ = '';
-                      _processing = false;
-                      return;
-                    }
-                    
-                    /* Set retry mode – keep same question, try next option */
-                    _retryingQ = q;
-                    _lastQ = q;
-                    log(modeLabel+' | ❌ Sai! Sẽ chọn lại... ('+_wrongIdxMap[q].length+'/'+optEls.length+')','#f44');
-                    _processing = false;
-                    /* Engine will re-trigger tryPlay on next tick for same question */
-                  } else {
-                    /* Answer was correct! Auto-harvest to DB */
+                /* Poll for 3 seconds to check result */
+                var pollCount = 0;
+                var maxPolls = 6; /* 6 x 500ms = 3s */
+                var pollTimer = setInterval(function(){
+                  pollCount++;
+                  
+                  /* Method 1: Question text changed → CORRECT! */
+                  var newQ = getCurrentQ();
+                  if(newQ && newQ !== q){
+                    clearInterval(pollTimer);
+                    /* Auto-harvest correct answer */
                     var correctText = optEls[targetIdx].textContent.trim().toLowerCase();
                     var harvestBatch = {};
                     harvestBatch[q.toLowerCase()] = [correctText];
@@ -447,14 +376,53 @@ function getScript(mode){
                       headers:{'Content-Type':'application/json'},
                       body: JSON.stringify(harvestBatch)
                     }).then(r=>r.json()).then(function(hd){
-                      log(modeLabel+' | ✅ Đúng! Đã ghi DB ('+hd.total+') | Chờ câu tiếp...','#00e676');
+                      log(modeLabel+' | ✅ Đúng! Ghi DB ('+hd.total+')','#00e676');
                     }).catch(function(){
-                      log(modeLabel+' | ✅ Đúng rồi! Chờ câu tiếp...','#00e676');
+                      log(modeLabel+' | ✅ Đúng rồi!','#00e676');
                     });
+                    _retryingQ = '';
+                    _lastQ = newQ;
+                    _wrongIdxMap[newQ] = [];
+                    _processing = false;
+                    return;
+                  }
+                  
+                  /* Method 2: Clicked element got wrong class → WRONG */
+                  if(isElementWrong(optEls[targetIdx])){
+                    clearInterval(pollTimer);
+                    if(_wrongIdxMap[q].indexOf(targetIdx) < 0) _wrongIdxMap[q].push(targetIdx);
+                    
+                    if(_wrongIdxMap[q].length >= optEls.length){
+                      log(modeLabel+' | ❌ Hết đáp án!','#f44');
+                      _retryingQ = '';
+                      _processing = false;
+                      return;
+                    }
+                    
+                    _retryingQ = q;
+                    _lastQ = q;
+                    log(modeLabel+' | ❌ Sai #'+(targetIdx+1)+'! Chọn lại... ('+_wrongIdxMap[q].length+'/'+optEls.length+')','#f44');
+                    _processing = false;
+                    return;
+                  }
+                  
+                  /* Timeout: assume correct and move on */
+                  if(pollCount >= maxPolls){
+                    clearInterval(pollTimer);
+                    /* Auto-harvest as likely correct */
+                    var correctText2 = optEls[targetIdx].textContent.trim().toLowerCase();
+                    var hBatch2 = {};
+                    hBatch2[q.toLowerCase()] = [correctText2];
+                    fetch(QSP_SERVER+'/harvest', {
+                      method:'POST',
+                      headers:{'Content-Type':'application/json'},
+                      body: JSON.stringify(hBatch2)
+                    }).catch(function(){});
+                    log(modeLabel+' | ✅ Đã chọn #'+(targetIdx+1)+' | Chờ câu tiếp...','#00e676');
                     _retryingQ = '';
                     _processing = false;
                   }
-                }, 1500); /* Wait 1.5s for wrong/correct feedback to appear */
+                }, 500);
               }, clickDelay);
             } else {
               _processing = false;
